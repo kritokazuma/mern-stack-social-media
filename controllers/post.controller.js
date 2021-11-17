@@ -5,6 +5,25 @@ exports.getPosts = async (req, res) => {
   return res.status(200).json(posts);
 };
 
+exports.getSinglePost = async (req, res) => {
+  const postId = req.params.postId
+  try {
+    const post = await Post.findById(postId)
+    if (post) {
+      return res.status(200).json(post)
+    } else {
+      return res.status(500).json({
+        errors: "post not found"
+      })
+    }
+  } catch (error) {
+    return res.status(501).json({
+      errors: error
+    })
+  }
+
+}
+
 exports.createPost = async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -12,8 +31,14 @@ exports.createPost = async (req, res) => {
       errors: "You are not authenticated",
     });
   }
+  const body = req.body.body
+  if (body.trim() === ""){
+    return res.status(501).json({
+      errors: "body must not be empty"
+    })
+  }
   const newPost = new Post({
-    body: req.body.body,
+    body,
     username: user.username,
     user: user.id,
   });

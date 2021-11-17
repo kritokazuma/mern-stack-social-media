@@ -16,8 +16,8 @@ exports.verify = async (req, res, next) => {
     req.user = decodedToken;
     next()
   } catch (error) {
-    return res.status(400).json({
-      errors: error,
+    return res.status(401).json({
+      error: "Token missing or invalid"
     });
   }
 };

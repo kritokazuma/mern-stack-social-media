@@ -3,6 +3,7 @@ const {
   getPosts,
   createPost,
   deletePost,
+  getSinglePost,
 } = require("../controllers/post.controller");
 const {
   createComment,
@@ -23,6 +24,7 @@ router.route("/posts/createpost").post(verify, createPost);
 router
   .route("/posts/:postId")
   .post(verify, createComment)
-  .delete(verify, deleteComment);
+  .delete(verify, deleteComment)
+  .get(getSinglePost);
 
 module.exports = router;
