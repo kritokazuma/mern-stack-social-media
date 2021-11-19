@@ -47,3 +47,33 @@ exports.deleteComment = async (req, res) => {
     });
   }
 };
+
+exports.editComment = async (req, res) => {
+  const user = req.user;
+  const postId = req.params.postId;
+  const { commentid } = req.query;
+  const { body } = req.body;
+  try {
+    const post = await Post.findById(postId);
+    if (post) {
+      if (
+        post.comments.find(
+          (comment) =>
+            comment.username === user.username && comment.id === commentid
+        )
+      ) {
+        const commentIndex = post.comments.findIndex(
+          (comment) => comment.id === commentid
+        );
+        post.comments[0].body = body;
+        await post.save();
+        return res.status(200).json(post);
+      }
+      return res.status(500).json("comment can't delete");
+    } else {
+      return res.status(500).json("post not found");
+    }
+  } catch (error) {
+    return res.status(501).json(error);
+  }
+};

@@ -40,6 +40,7 @@ export default function SinglePost({ post, setPosts }) {
             username={post.username}
             postId={post._id}
             setPosts={setPosts}
+            location="home"
           />
         </Box>
       </Box>

@@ -5,6 +5,8 @@ import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
 import CreatePost from "../components/CreatePost";
 
+export const HomeContext = React.createContext();
+
 export default function Home() {
   const [posts, setPosts] = useState([]);
 
@@ -42,11 +44,13 @@ export default function Home() {
         }}
         gap={6}
       >
-        {user && (
-          <CreatePost setPosts={setPosts} posts={posts} />
-        )}
+        {user && <CreatePost setPosts={setPosts} posts={posts} />}
         {posts.map((p) => (
-          <Posts post={p} key={p._id} setPosts={setPosts} />
+          <Box key={p._id}>
+            <HomeContext.Provider value={{ posts, setPosts }}>
+              <Posts post={p} setPosts={setPosts} />
+            </HomeContext.Provider>
+          </Box>
         ))}
       </Grid>
     </Box>

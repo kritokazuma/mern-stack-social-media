@@ -6,23 +6,47 @@ exports.getPosts = async (req, res) => {
 };
 
 exports.getSinglePost = async (req, res) => {
-  const postId = req.params.postId
+  const postId = req.params.postId;
   try {
-    const post = await Post.findById(postId)
+    const post = await Post.findById(postId);
     if (post) {
-      return res.status(200).json(post)
+      return res.status(200).json(post);
     } else {
       return res.status(500).json({
-        errors: "post not found"
-      })
+        errors: "post not found",
+      });
     }
   } catch (error) {
     return res.status(501).json({
-      errors: error
-    })
+      errors: error,
+    });
   }
+};
 
-}
+exports.updatePost = async (req, res) => {
+  const user = req.user;
+  const postId = req.params.postId;
+  const { body } = req.body;
+
+  const getpost = async () => {
+    const post = await Post.findById(postId);
+    return post;
+  };
+
+  try {
+    const post = await getpost()
+    if (post.username === user.username) {
+      const postUpdate = await post.updateOne({ body: body });
+      return res.status(200).json(await getpost());
+    } else {
+      return res.status(400).json({
+        errors: "You are not post owner",
+      });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
 
 exports.createPost = async (req, res) => {
   const user = req.user;
@@ -31,11 +55,11 @@ exports.createPost = async (req, res) => {
       errors: "You are not authenticated",
     });
   }
-  const body = req.body.body
-  if (body.trim() === ""){
+  const body = req.body.body;
+  if (body.trim() === "") {
     return res.status(501).json({
-      errors: "body must not be empty"
-    })
+      errors: "body must not be empty",
+    });
   }
   const newPost = new Post({
     body,
@@ -71,5 +95,3 @@ exports.deletePost = async (req, res) => {
     errors: "Post not found",
   });
 };
-
-

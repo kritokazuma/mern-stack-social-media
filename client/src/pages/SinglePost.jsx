@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import {
   Box,
-  Image,
   Text,
   Flex,
   Spinner,
@@ -20,6 +19,10 @@ import Comments from "../components/Comments";
 import SubmitComment from "../components/SubmitComment";
 import { AuthContext } from "../context/AuthContext";
 
+export const SingleContext = React.createContext();
+
+export const CommentContext = React.createContext();
+
 export default function SinglePost() {
   const parmas = useParams();
   const postId = parmas.postId;
@@ -29,9 +32,12 @@ export default function SinglePost() {
   const [comments, setComments] = useState([]);
 
   useEffect(async () => {
-    const getPost = await axios.get(`/api/posts/${postId}`);
-    setPost(getPost.data);
-    setComments(getPost.data.comments);
+    const fetchPost = async () => {
+      const getPost = await axios.get(`/api/posts/${postId}`);
+      setPost(getPost.data);
+      setComments(getPost.data.comments);
+    };
+    fetchPost();
   }, []);
 
   if (!post) {
@@ -73,7 +79,15 @@ export default function SinglePost() {
             </Text>
           </Box>
           <Box placeSelf="flex-start" style={{ marginLeft: "auto" }}>
-            <MenuButton username={post.username} />
+            <MenuButton
+              username={post.username}
+              type="post"
+              toHome={true}
+              postId={post._id}
+              location="single"
+              post={post}
+              setPost={setPost}
+            />
           </Box>
         </Box>
         <Box>
@@ -89,7 +103,9 @@ export default function SinglePost() {
       {user && <SubmitComment postId={postId} setComments={setComments} />}
       {comments.map((comment) => (
         <Box key={comment._id}>
-          <Comments comment={comment} />
+          <CommentContext.Provider value={{ comment, postId, setComments }}>
+            <Comments location='comment' />
+          </CommentContext.Provider>
         </Box>
       ))}
     </>

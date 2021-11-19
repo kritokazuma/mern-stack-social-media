@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, Wrap, WrapItem, Avatar, Text } from "@chakra-ui/react";
 import moment from "moment";
 import MenuButton from "./MenuButton";
+import { CommentContext } from "../pages/SinglePost";
 
-export default function Comments({ comment }) {
-  const { id, username, body, createdAt } = comment;
+export default function Comments({ location }) {
+  const { comment, postId, setComments } = useContext(CommentContext);
+  const { _id, username, body, createdAt } = comment;
   return (
     <Box mt={3} display="flex">
       <Box mt={4} ml={5}>
@@ -30,7 +32,13 @@ export default function Comments({ comment }) {
             </Text>
           </Box>
           <Box placeSelf="flex-start" style={{ marginLeft: "auto" }}>
-            <MenuButton type='comment' username={username} />
+            <MenuButton
+              type="comment"
+              username={username}
+              postId={postId}
+              commentId={_id}
+              setComments={setComments}
+            />
           </Box>
         </Box>
         <Text mt={5}>{body}</Text>
