@@ -6,7 +6,7 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import MenuButton from "./MenuButton";
 
-export default function SinglePost({ post, setPosts }) {
+export default function SinglePost({ post, setPosts, location }) {
   return (
     <Box
       display="block"
@@ -29,7 +29,15 @@ export default function SinglePost({ post, setPosts }) {
           </Wrap>
         </Box>
         <Box ml={2}>
-          <Text fontWeight="bold">{post.username}</Text>
+          <Box>
+            <Text
+              as={Link}
+              to={`/posts/user/${post.username}`}
+              fontWeight="bold"
+            >
+              {post.username}
+            </Text>
+          </Box>
           <Text as={Link} to={`/posts/${post._id}`} color="gray.500">
             {moment(post.createdAt).fromNow()}
           </Text>
@@ -40,7 +48,7 @@ export default function SinglePost({ post, setPosts }) {
             username={post.username}
             postId={post._id}
             setPosts={setPosts}
-            location="home"
+            location={location}
           />
         </Box>
       </Box>

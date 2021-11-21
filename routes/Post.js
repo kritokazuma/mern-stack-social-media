@@ -5,6 +5,7 @@ const {
   deletePost,
   getSinglePost,
   updatePost,
+  userPosts
 } = require("../controllers/post.controller");
 const {
   createComment,
@@ -26,7 +27,10 @@ router
   //like post
   .post(verify, likePost);
 
+//create a new post
 router.route("/posts/createpost").post(verify, createPost);
+
+router.route("/posts/user/:username").get(userPosts);
 
 router
   .route("/posts/:postId")
@@ -43,6 +47,7 @@ router
   //update post
   .put(verify, updatePost)
 
-  .patch(verify, editComment)
+  //update comment
+  .patch(verify, editComment);
 
 module.exports = router;

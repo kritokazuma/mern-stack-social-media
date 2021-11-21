@@ -7,13 +7,14 @@ import Register from "./pages/Register";
 import { Container } from "@chakra-ui/layout";
 import { AuthProvider } from "./context/AuthContext";
 import SinglePost from "./pages/SinglePost";
-import axios from 'axios'
-import './App.css'
+import UserPosts from "./pages/UserPosts";
+import axios from "axios";
+import "./App.css";
 
 function App() {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem("token");
 
-  axios.defaults.headers.common['Authorization'] = `bearer ${token}`
+  axios.defaults.headers.common["Authorization"] = `bearer ${token}`;
 
   return (
     <Router>
@@ -24,7 +25,8 @@ function App() {
             <Route path="/" element={<Home />} render={<NavBar />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path='/posts/:postId' element={<SinglePost />} />
+            <Route path="/posts/:postId" element={<SinglePost />} />
+            <Route path="/posts/user/:username" element={<UserPosts />} />
           </Routes>
         </Container>
       </AuthProvider>

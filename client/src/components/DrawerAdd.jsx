@@ -13,6 +13,7 @@ import {
 import axios from "axios";
 import { HomeContext } from "../pages/Home";
 import { CommentContext } from "../pages/SinglePost";
+import { UserPostsContext } from "../pages/UserPosts";
 
 export default function DrawerAdd({
   isDrawerOpen,
@@ -29,9 +30,11 @@ export default function DrawerAdd({
 
   const commentContext = useContext(CommentContext);
 
-  useEffect(() => {
+  const UserContext = useContext(UserPostsContext);
+
+  useEffect(async () => {
     if (location === "home") {
-      const findPost = context.posts.find((p) => p._id === postId);
+      const findPost = await context.posts.find((p) => p._id === postId);
       setPostInp(findPost.body);
     }
     if (location === "single") {
@@ -40,10 +43,26 @@ export default function DrawerAdd({
     if (type === "comment") {
       setPostInp(commentContext.comment.body);
     }
+
+    if (UserContext) {
+      setPostInp(UserContext.post.body);
+    }
   }, []);
 
   async function handleEditPost() {
     const post = await axios.put(`/api/posts/${postId}`, { body: postInp });
+    if (UserContext) {
+      UserContext.setUserPosts((preVal) => {
+        const updatePost = preVal.posts.map((p) => {
+          if (p._id === postId) {
+            return post.data;
+          } else {
+            return p;
+          }
+        });
+        return { ...preVal, posts: updatePost };
+      });
+    }
 
     if (location === "home") {
       const replacePost = () => {
@@ -59,13 +78,12 @@ export default function DrawerAdd({
       };
 
       context.setPosts(replacePost);
-      closeDrawer();
     }
 
     if (location === "single") {
       setPost(post.data);
-      closeDrawer();
     }
+    closeDrawer();
   }
 
   async function handleEditComment() {

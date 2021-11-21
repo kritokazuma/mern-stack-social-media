@@ -33,7 +33,7 @@ exports.login = async (req, res) => {
 
   if (!validatePassword) {
     return res.status(501).json({
-      errors: "Wrong username or password",
+      error: "Wrong username or password",
     });
   }
   const token = jwtGenerate(user);
@@ -57,7 +57,7 @@ exports.register = async (req, res) => {
   const checkUser = await User.findOne({ username });
   if (checkUser) {
     return res.status(500).json({
-      errors: "username already register",
+      errors: { error: "username already register" },
     });
   }
 
@@ -74,7 +74,7 @@ exports.register = async (req, res) => {
     return res.status(200).json({ token });
   } catch (error) {
     res.status(502).json({
-      errors: error,
+      error,
     });
   }
 };

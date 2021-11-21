@@ -1,9 +1,24 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Heading, Center, Box, Grid, Flex, Spinner } from "@chakra-ui/react";
+import {
+  Heading,
+  Center,
+  Box,
+  Grid,
+  Flex,
+  Spinner,
+  Tabs,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  IconButton,
+} from "@chakra-ui/react";
 import axios from "axios";
 import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
 import CreatePost from "../components/CreatePost";
+import { BiHome, BiMessageRoundedMinus } from "react-icons/bi";
+import { IoNotificationsOutline } from "react-icons/io5";
 
 export const HomeContext = React.createContext();
 
@@ -32,27 +47,41 @@ export default function Home() {
 
   return (
     <Box pt={5}>
-      <Center>
-        <Heading size="xl">Recent Posts</Heading>
-      </Center>
-      <Grid
-        mt={10}
-        templateColumns={{
-          base: "repeat(1, 1fr)",
-          md: "repeat(2, 1fr)",
-          lg: "repeat(3, 1fr)",
-        }}
-        gap={6}
-      >
-        {user && <CreatePost setPosts={setPosts} posts={posts} />}
-        {posts.map((p) => (
-          <Box key={p._id}>
-            <HomeContext.Provider value={{ posts, setPosts }}>
-              <Posts post={p} setPosts={setPosts} />
-            </HomeContext.Provider>
-          </Box>
-        ))}
-      </Grid>
+      <Tabs isFitted>
+        <TabList>
+          <Tab>
+            <BiHome color="teal" size="1.9rem" />
+          </Tab>
+          <Tab>
+            <BiMessageRoundedMinus color="teal" size="1.9rem" />
+          </Tab>
+          <Tab>
+            <IoNotificationsOutline color="teal" size="1.9rem" />
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <Grid
+              mt={10}
+              templateColumns={{
+                base: "repeat(1, 1fr)",
+                md: "repeat(2, 1fr)",
+                lg: "repeat(3, 1fr)",
+              }}
+              gap={6}
+            >
+              {user && <CreatePost setPosts={setPosts} posts={posts} />}
+              {posts.map((p) => (
+                <Box key={p._id}>
+                  <HomeContext.Provider value={{ posts, setPosts }}>
+                    <Posts post={p} setPosts={setPosts} location="home" />
+                  </HomeContext.Provider>
+                </Box>
+              ))}
+            </Grid>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Box>
   );
 }

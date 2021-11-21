@@ -34,7 +34,7 @@ exports.updatePost = async (req, res) => {
   };
 
   try {
-    const post = await getpost()
+    const post = await getpost();
     if (post.username === user.username) {
       const postUpdate = await post.updateOne({ body: body });
       return res.status(200).json(await getpost());
@@ -94,4 +94,21 @@ exports.deletePost = async (req, res) => {
   return res.status(400).json({
     errors: "Post not found",
   });
+};
+
+exports.userPosts = async (req, res) => {
+  const username = req.params.username;
+  const getUserPosts = await Post.find({ username });
+  try {
+    if (getUserPosts) {
+      return res.status(200).json({
+        username,
+        posts: getUserPosts
+      });
+    } else {
+      return res.status(500).json("user not found");
+    }
+  } catch (error) {
+    res.status(501).json(error);
+  }
 };
