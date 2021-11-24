@@ -10,10 +10,11 @@ import {
   Input,
   Flex,
   useColorModeValue,
+  IconButton,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { FcUpload } from "react-icons/fc";
+import { BiUpload } from "react-icons/bi";
 import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
 
@@ -24,56 +25,91 @@ export default function UserPosts() {
 
   const { user } = useContext(AuthContext);
 
-  const [userPosts, setUserPosts] = useState({
-    username: "",
-    posts: [],
-  });
+  const [file, setFile] = useState("");
+  const [fileName, setFileName] = useState("Upload a new profile picture");
+
+  const [update, setUpdate] = useState(true);
+
+  const [userPosts, setUserPosts] = useState([]);
   const params = useParams();
 
   const username = params.username;
+  const profileImg =
+    userPosts.length > 0 ? `/api/${userPosts[0].user.profileImage}` : " ";
+
+  //upload a photo
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await axios.post("/api/profile/user/images", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log(res.data);
+    setUpdate(!update);
+  };
 
   useEffect(async () => {
+    console.log("i got called");
     try {
       const getPosts = await axios.get(`/api/posts/user/${username}`);
       setUserPosts(getPosts.data);
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [update]);
+
+  console.log(userPosts);
 
   return (
     <Box>
       <Center mt={20}>
         <Wrap>
           <WrapItem>
-            <Avatar size="xl" name="profile" src="https://bit.ly/dan-abramov" />
+            <Avatar size="xl" name="profile" src={profileImg} />
           </WrapItem>
         </Wrap>
       </Center>
       <Center>
         <Text fontWeight="bold" fontSize="xl" mt={3}>
-          {userPosts.username}
+          {userPosts.length > 0 && userPosts[0].username}
         </Text>
       </Center>
       {user.username === username && (
-        <Center mt={3}>
-          <Box w="300px" borderRadius="lg" backgroundColor={textBg}>
-            <label for="file-input">
-              <Box p={2}>
-                <Flex justifyContent="center">
-                  <span>Upload new profile picture</span>
-                  <FcUpload size="1.5rem" />
-                </Flex>
-              </Box>
-            </label>
-            <Input
-              display="none"
-              id="file-input"
-              colorScheme="teal"
-              type="file"
+        <form onSubmit={handleSubmit}>
+          <Center mt={3}>
+            <Box w="300px" borderRadius="lg" backgroundColor={textBg}>
+              <label htmlFor="file-input">
+                <Box className="fileBox" p={2} h="40px">
+                  <span>
+                    {fileName.length > 30
+                      ? `${fileName.slice(0, 30)}...`
+                      : fileName}
+                  </span>
+                </Box>
+              </label>
+              <Input
+                display="none"
+                id="file-input"
+                colorScheme="teal"
+                type="file"
+                accept="image/png, image/jpeg"
+                onChange={(e) => {
+                  setFile(e.target.files[0]);
+                  setFileName(e.target.files[0].name);
+                }}
+              />
+            </Box>
+            <IconButton
+              ml={3}
+              type="submit"
+              backgroundColor={textBg}
+              icon={<BiUpload size="1.3rem" color="teal" />}
             />
-          </Box>
-        </Center>
+          </Center>
+        </form>
       )}
       <Grid
         mt={10}
@@ -84,7 +120,7 @@ export default function UserPosts() {
         }}
         gap={6}
       >
-        {userPosts.posts.map((post) => (
+        {userPosts.map((post) => (
           <Box key={post._id}>
             <UserPostsContext.Provider value={{ post, setUserPosts }}>
               <Posts post={post} />

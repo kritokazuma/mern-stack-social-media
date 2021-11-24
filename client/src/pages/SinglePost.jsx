@@ -40,6 +40,9 @@ export default function SinglePost() {
     fetchPost();
   }, []);
 
+
+  const profileImg =
+    post && post.user.profileImage !== null ? `/api/${post.user.profileImage}` : " ";
   if (!post) {
     return (
       <Flex height="100vh" alignItems="center" justifyContent="center">
@@ -62,11 +65,7 @@ export default function SinglePost() {
           <Box>
             <Wrap>
               <WrapItem>
-                <Avatar
-                  size="md"
-                  name="profile"
-                  src="https://bit.ly/dan-abramov"
-                />
+                <Avatar size="md" name="profile" src={profileImg} />
               </WrapItem>
             </Wrap>
           </Box>
@@ -104,7 +103,7 @@ export default function SinglePost() {
       {comments.map((comment) => (
         <Box key={comment._id}>
           <CommentContext.Provider value={{ comment, postId, setComments }}>
-            <Comments location='comment' />
+            <Comments location="comment" />
           </CommentContext.Provider>
         </Box>
       ))}

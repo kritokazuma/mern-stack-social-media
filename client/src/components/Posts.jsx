@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import MenuButton from "./MenuButton";
 
 export default function SinglePost({ post, setPosts, location }) {
+  const profileImg =
+    post.user.profileImage !== null ? `/api/${post.user.profileImage}` : "";
   return (
     <Box
       display="block"
@@ -20,11 +22,7 @@ export default function SinglePost({ post, setPosts, location }) {
         <Box>
           <Wrap>
             <WrapItem>
-              <Avatar
-                size="md"
-                name="profile"
-                src="https://bit.ly/dan-abramov"
-              />
+              <Avatar size="md" name="profile" src={profileImg} />
             </WrapItem>
           </Wrap>
         </Box>

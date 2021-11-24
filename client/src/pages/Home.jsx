@@ -37,13 +37,13 @@ export default function Home() {
     }
   }, []);
 
-  if (posts.length === 0) {
-    return (
-      <Flex height="100vh" alignItems="center" justifyContent="center">
-        <Spinner size="xl" />
-      </Flex>
-    );
-  }
+  // if (posts.length === 0) {
+  //   return (
+  //     <Flex height="100vh" alignItems="center" justifyContent="center">
+  //       <Spinner size="xl" />
+  //     </Flex>
+  //   );
+  // }
 
   return (
     <Box pt={5}>

@@ -6,13 +6,16 @@ import { CommentContext } from "../pages/SinglePost";
 
 export default function Comments({ location }) {
   const { comment, postId, setComments } = useContext(CommentContext);
-  const { _id, username, body, createdAt } = comment;
+  const { _id, username, body, createdAt, user } = comment;
+  const profileImg =
+    user.profileImage !== null ? `/api/${user.profileImage}` : " ";
+
   return (
     <Box mt={3} display="flex">
       <Box mt={4} ml={5}>
         <Wrap>
           <WrapItem>
-            <Avatar size="md" name="profile" src="https://bit.ly/dan-abramov" />
+            <Avatar size="md" name="profile" src={profileImg} />
           </WrapItem>
         </Wrap>
       </Box>
