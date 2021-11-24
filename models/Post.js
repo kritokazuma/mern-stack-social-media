@@ -4,11 +4,17 @@ const postSchema = mongoose.Schema(
   {
     body: String,
     username: String,
+    profileImage: String,
     comments: [
       {
         body: String,
         username: String,
+        profileImage: String,
         createdAt: String,
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
       },
     ],
     likes: [
@@ -19,7 +25,7 @@ const postSchema = mongoose.Schema(
     ],
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "User",
     },
   },
   { timestamps: true }

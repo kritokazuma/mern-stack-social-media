@@ -3,15 +3,30 @@ const Post = require("../models/Post");
 exports.createComment = async (req, res) => {
   const user = req.user;
   const postId = req.params.postId;
-  const post = await Post.findById(postId);
+  const post = await Post.findById(postId).populate({
+    path: "comments",
+    populate: {
+      path: "user",
+      select: "profileImage",
+    },
+  });
+
 
   if (post) {
     post.comments.unshift({
       body: req.body.body,
       username: user.username,
       createdAt: new Date().toISOString(),
+      user: user.id,
     });
     await post.save();
+    await post.populate({
+      path: "comments",
+      populate: {
+        path: "user",
+        select: "profileImage",
+      },
+    });
     return res.status(200).json(post);
   }
   return res.status(500).json({

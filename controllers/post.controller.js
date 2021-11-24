@@ -1,14 +1,24 @@
 const Post = require("../models/Post");
 
 exports.getPosts = async (req, res) => {
-  const posts = await Post.find({}).sort({ createdAt: -1 });
+  const posts = await Post.find({})
+    .populate("user", "profileImage")
+    .sort({ createdAt: -1 });
   return res.status(200).json(posts);
 };
 
 exports.getSinglePost = async (req, res) => {
   const postId = req.params.postId;
   try {
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId)
+      .populate("user", "profileImage")
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "profileImage",
+        },
+      });
     if (post) {
       return res.status(200).json(post);
     } else {
@@ -23,13 +33,35 @@ exports.getSinglePost = async (req, res) => {
   }
 };
 
+exports.userPosts = async (req, res) => {
+  const username = req.params.username;
+  const getUserPosts = await Post.find({ username })
+    .populate("user", "profileImage")
+    .populate({
+      path: "comments",
+      populate: {
+        path: "user",
+        select: "profileImage",
+      },
+    });
+  try {
+    if (getUserPosts) {
+      return res.status(200).json(getUserPosts);
+    } else {
+      return res.status(500).json("user not found");
+    }
+  } catch (error) {
+    res.status(501).json(error);
+  }
+};
+
 exports.updatePost = async (req, res) => {
   const user = req.user;
   const postId = req.params.postId;
   const { body } = req.body;
 
   const getpost = async () => {
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate("user", "profileImage");
     return post;
   };
 
@@ -50,11 +82,6 @@ exports.updatePost = async (req, res) => {
 
 exports.createPost = async (req, res) => {
   const user = req.user;
-  if (!user) {
-    return res.status(404).json({
-      errors: "You are not authenticated",
-    });
-  }
   const body = req.body.body;
   if (body.trim() === "") {
     return res.status(501).json({
@@ -68,6 +95,8 @@ exports.createPost = async (req, res) => {
   });
   try {
     await newPost.save();
+    await newPost.populate("user", "profileImage");
+
     return res.status(200).json(newPost);
   } catch (error) {
     res.status(500).json({
@@ -94,21 +123,4 @@ exports.deletePost = async (req, res) => {
   return res.status(400).json({
     errors: "Post not found",
   });
-};
-
-exports.userPosts = async (req, res) => {
-  const username = req.params.username;
-  const getUserPosts = await Post.find({ username });
-  try {
-    if (getUserPosts) {
-      return res.status(200).json({
-        username,
-        posts: getUserPosts
-      });
-    } else {
-      return res.status(500).json("user not found");
-    }
-  } catch (error) {
-    res.status(501).json(error);
-  }
 };

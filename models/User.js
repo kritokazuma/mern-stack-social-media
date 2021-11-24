@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please provide a password"],
       unique: true,
     },
+    profileImage: { type: String, default: null },
   },
   { timestamps: true }
 );
