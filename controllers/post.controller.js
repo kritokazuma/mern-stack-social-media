@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 
+//get all posts
 exports.getPosts = async (req, res) => {
   const posts = await Post.find({})
     .populate("user", "profileImage")
@@ -33,6 +34,7 @@ exports.getSinglePost = async (req, res) => {
   }
 };
 
+//get posts of single user
 exports.userPosts = async (req, res) => {
   const username = req.params.username;
   const getUserPosts = await Post.find({ username })
@@ -55,6 +57,7 @@ exports.userPosts = async (req, res) => {
   }
 };
 
+//update post of owner
 exports.updatePost = async (req, res) => {
   const user = req.user;
   const postId = req.params.postId;
@@ -80,6 +83,8 @@ exports.updatePost = async (req, res) => {
   }
 };
 
+
+//create post
 exports.createPost = async (req, res) => {
   const user = req.user;
   const body = req.body.body;
@@ -105,6 +110,8 @@ exports.createPost = async (req, res) => {
   }
 };
 
+
+//delete post of owner
 exports.deletePost = async (req, res) => {
   const user = req.user;
 

@@ -1,5 +1,6 @@
 const Post = require('../models/Post')
 
+//like post
 exports.likePost = async (req, res) => {
     const user = req.user
     const postId = req.query.postid

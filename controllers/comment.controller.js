@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 
+//Create comment
 exports.createComment = async (req, res) => {
   const user = req.user;
   const postId = req.params.postId;
@@ -34,6 +35,8 @@ exports.createComment = async (req, res) => {
   });
 };
 
+
+//Delete comment
 exports.deleteComment = async (req, res) => {
   const user = req.user;
   const postId = req.params.postId;
@@ -63,6 +66,8 @@ exports.deleteComment = async (req, res) => {
   }
 };
 
+
+//edit comment
 exports.editComment = async (req, res) => {
   const user = req.user;
   const postId = req.params.postId;

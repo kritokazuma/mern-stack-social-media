@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { registerVerify, loginVerify } = require("../utils/verifyInput");
 
+// Genereate jwt token
 const jwtGenerate = (user) => {
   const token = jwt.sign(
     {
@@ -16,17 +17,23 @@ const jwtGenerate = (user) => {
   return token;
 };
 
+//login user
 exports.login = async (req, res) => {
+  //req credentials from body
   const { username, password } = req.body;
 
+  //verify login input
   const { errors, valid } = loginVerify(username, password);
 
+  //check valid or not
   if (!valid) {
     return res.status(500).json({ errors });
   }
 
+  //find is user registered or not
   const user = await User.findOne({ username });
 
+  //if register or not, check hash password
   const validatePassword = !user
     ? false
     : await bcrypt.compare(password, user.password);
@@ -40,9 +47,12 @@ exports.login = async (req, res) => {
   return res.status(200).json({ token });
 };
 
+//register user
 exports.register = async (req, res) => {
+  //req credentials from body
   const { email, username, password, confirmPassword } = req.body;
 
+  //verify register input
   const { errors, valid } = registerVerify(
     email,
     username,
@@ -54,6 +64,7 @@ exports.register = async (req, res) => {
     return res.status(502).json({ errors });
   }
 
+  //check is user already register or not
   const checkUser = await User.findOne({ username });
   if (checkUser) {
     return res.status(500).json({
@@ -61,6 +72,7 @@ exports.register = async (req, res) => {
     });
   }
 
+  //if username is not already register, hash the password and save to database
   try {
     const hash = await bcrypt.hash(password, 11);
     const newUser = new User({

@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const { unlink, readFile } = require("fs/promises");
 
+
+//upload profile image
 exports.profileImage = async (req, res) => {
   const user = req.user;
   const getUser = await User.findById(user.id);
