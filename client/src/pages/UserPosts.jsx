@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import {
   Box,
   Wrap,
@@ -11,16 +11,23 @@ import {
   Flex,
   useColorModeValue,
   IconButton,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BiUpload } from "react-icons/bi";
+import { BsFillPersonPlusFill } from "react-icons/bs";
+import { AiOutlineMessage } from "react-icons/ai";
 import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
+import { io } from "socket.io-client";
 
 export const UserPostsContext = React.createContext();
 
 export default function UserPosts() {
+  const token = localStorage.getItem("token");
+
+  const socket = useRef();
   const textBg = useColorModeValue("gray.100", "gray.700");
 
   const { user } = useContext(AuthContext);
@@ -36,6 +43,45 @@ export default function UserPosts() {
   const username = params.username;
   const profileImg =
     userPosts.length > 0 ? `/api/${userPosts[0].user.profileImage}` : " ";
+
+  useEffect(() => {
+    socket.current = io("ws://localhost:4000", { query: `token=${token}` });
+  }, []);
+
+  //websocket
+
+  const [userFromFriendReq, setUserFromFriendReq] = useState("");
+  const toast = useToast();
+  useEffect(() => {
+    console.log("test");
+
+    socket.current.on("send_message", (data) => {
+      if (data) {
+        setUserFromFriendReq(data);
+        console.log(data);
+        toast({
+          title: `Friend request`,
+          position: "top-right",
+          description: `${data} requested friend request`,
+          isClosable: "true",
+        });
+      }
+    });
+  }, [socket]);
+
+  //add friend
+  const handleAddFriend = async () => {
+    socket.current.emit("add_friend", {
+      friendId: userPosts[0].user._id,
+      username: user.username,
+    });
+    toast({
+      title: `Friend request`,
+      description: ` requested friend request`,
+      status: "success",
+      isClosable: "true",
+    });
+  };
 
   //upload a photo
   const handleSubmit = async (e) => {
@@ -61,8 +107,6 @@ export default function UserPosts() {
     }
   }, [update]);
 
-  console.log(userPosts);
-
   return (
     <Box>
       <Center mt={20}>
@@ -72,12 +116,34 @@ export default function UserPosts() {
           </WrapItem>
         </Wrap>
       </Center>
-      <Center>
+      <Flex alignItems="center" justifyContent="center">
+        {user && user.username !== username && (
+          <Box mr={5} mt={4}>
+            <IconButton
+              verticalAlign="text-bottom"
+              colorScheme="teal"
+              variant="ghost"
+              icon={<BsFillPersonPlusFill size="1.6rem" />}
+              onClick={handleAddFriend}
+            />
+          </Box>
+        )}
         <Text fontWeight="bold" fontSize="xl" mt={3}>
           {userPosts.length > 0 && userPosts[0].username}
         </Text>
-      </Center>
-      {user.username === username && (
+        {user && user.username !== username && (
+          <Box ml={5} mt={4}>
+            <IconButton
+              verticalAlign="text-bottom"
+              colorScheme="teal"
+              variant="ghost"
+              icon={<AiOutlineMessage size="1.6rem" />}
+            />
+          </Box>
+        )}
+      </Flex>
+
+      {user && user.username === username && (
         <form onSubmit={handleSubmit}>
           <Center mt={3}>
             <Box w="300px" borderRadius="lg" backgroundColor={textBg}>

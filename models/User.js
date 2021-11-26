@@ -18,6 +18,15 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     profileImage: { type: String, default: null },
+    friends: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        status: String,
+      },
+    ],
   },
   { timestamps: true }
 );

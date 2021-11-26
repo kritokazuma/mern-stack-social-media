@@ -4,7 +4,7 @@ const Post = require("../models/Post");
 exports.getPosts = async (req, res) => {
   const posts = await Post.find({})
     .populate("user", "profileImage")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
   return res.status(200).json(posts);
 };
 

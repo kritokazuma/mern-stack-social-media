@@ -4,8 +4,20 @@ const connectDB = require("./config/db");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const path = require("path");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
+
+const server = createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
+
+module.exports = io
 
 app.use("/api/images", express.static(path.join(__dirname, "public/images")));
 
@@ -23,4 +35,4 @@ app.use("/api/profile", require("./routes/Images"));
 
 const port = process.env.PORT;
 
-app.listen(port, () => console.log(`server is running on port ${port}`));
+server.listen(port, () => console.log(`server is running on port ${port}`));

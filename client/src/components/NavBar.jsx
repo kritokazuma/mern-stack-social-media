@@ -1,11 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   HStack,
   Text,
   Flex,
-  IconButton,
+  Box,
   useColorMode,
   Button,
+  Switch,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { FaSun } from "react-icons/fa";
@@ -16,7 +17,7 @@ export default function NavBar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { user, logout } = useContext(AuthContext);
 
-  const color = colorMode === 'light' ? "black" : "white"
+  const color = colorMode === "light" ? "black" : "white";
 
   return (
     <Flex
@@ -54,12 +55,17 @@ export default function NavBar() {
           </>
         )}
 
-        <IconButton
-          variant='ghost'
-          style={{ marginLeft: "20px" }}
-          icon={colorMode === "light" ? <FaSun /> : <IoMdMoon />}
-          onClick={toggleColorMode}
+        <Box mt={2} w="20px">
+          {colorMode === "light" && <FaSun />}
+        </Box>
+        <Switch
+          size="md"
+          isChecked={colorMode === "dark"}
+          onChange={toggleColorMode}
         />
+        <Box mt={1} w="20px">
+          <Box ml={1}>{colorMode === "dark" && <IoMdMoon />}</Box>
+        </Box>
       </HStack>
     </Flex>
   );

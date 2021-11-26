@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useRef } from "react";
 import NavBar from "./components/NavBar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
@@ -10,6 +10,8 @@ import SinglePost from "./pages/SinglePost";
 import UserPosts from "./pages/UserPosts";
 import axios from "axios";
 import "./App.css";
+
+export const WsContext = React.createContext();
 
 function App() {
   const token = localStorage.getItem("token");

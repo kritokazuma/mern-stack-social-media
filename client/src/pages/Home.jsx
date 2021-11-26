@@ -19,6 +19,7 @@ import { AuthContext } from "../context/AuthContext";
 import CreatePost from "../components/CreatePost";
 import { BiHome, BiMessageRoundedMinus } from "react-icons/bi";
 import { IoNotificationsOutline } from "react-icons/io5";
+import MessagePanel from "../components/MessagePanel";
 
 export const HomeContext = React.createContext();
 
@@ -79,6 +80,9 @@ export default function Home() {
                 </Box>
               ))}
             </Grid>
+          </TabPanel>
+          <TabPanel>
+            <MessagePanel />
           </TabPanel>
         </TabPanels>
       </Tabs>

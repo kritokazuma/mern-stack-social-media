@@ -2,6 +2,69 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { registerVerify, loginVerify } = require("../utils/verifyInput");
+const io = require("../index");
+const { validateToken } = require("../utils/wsJwtVerify");
+
+let userLists = [];
+
+const activeUser = (userId, socketId) => {
+  !userLists.some((u) => u.userId === userId) &&
+    userLists.push({ userId, socketId });
+};
+
+const removeUser = (socketId) => {
+  userLists = userLists.filter((u) => u.socketId !== socketId);
+};
+
+io.on("connection", async (socket) => {
+  console.log("connected");
+  const token = socket.handshake.query.token;
+  let user;
+  try {
+    user = await validateToken(token);
+    activeUser(user.id, socket.id);
+  } catch (error) {
+    console.log(error);
+  }
+
+  socket.on("add_friend", async ({ friendId, username }) => {
+    const friendList = userLists.find((u) => u.userId === friendId);
+    if (friendList) {
+      try {
+        const checkFriend = await User.findById(friendId);
+        const checkUser = await User.findById(user.id);
+        // console.log(checkUser);
+
+        if (checkFriend && checkUser) {
+          if (checkUser) {
+            const testCheck = checkUser.friends.find(
+              (u) => u.username == checkFriend.username
+            );
+            console.log(testCheck);
+            if (checkUser.friends.find((u) => u.user == friendId)) {
+              console.log("already friend");
+              checkUser.friends = checkUser.friends.filter(
+                (f) => f.user != friendId
+              );
+            } else {
+              console.log("friend added");
+              checkUser.friends.unshift({ user: friendId, status: "pending" });
+            }
+            await checkUser.save();
+          } else throw new Error("user not found");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      socket.to(friendList.socketId).emit("send_message", username);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    removeUser(socket.id);
+    console.log("user disconnect");
+  });
+});
 
 // Genereate jwt token
 const jwtGenerate = (user) => {
@@ -88,5 +151,31 @@ exports.register = async (req, res) => {
     res.status(502).json({
       error,
     });
+  }
+};
+
+exports.addFriend = async (req, res) => {
+  const user = req.user;
+  const userId = req.query.user;
+  try {
+    const checkFriend = await User.findById(userId);
+
+    if (checkFriend) {
+      const checkUser = await User.findById(user.id);
+      if (checkUser) {
+        if (checkUser.friends.includes(userId)) {
+          const indexOfFriend = checkUser.friends.indexOf(userId);
+          checkUser.friends.splice(0, 1);
+          await checkUser.save();
+        } else {
+          checkUser.friends.unshift(userId);
+          await checkUser.save();
+        }
+        return res.status(200).json("successfull added");
+      } else throw new Error("user not found");
+    }
+    return res.status(500);
+  } catch (error) {
+    res.status(501).json({ error });
   }
 };
