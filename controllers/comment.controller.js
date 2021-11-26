@@ -12,7 +12,6 @@ exports.createComment = async (req, res) => {
     },
   });
 
-
   if (post) {
     post.comments.unshift({
       body: req.body.body,
@@ -34,7 +33,6 @@ exports.createComment = async (req, res) => {
     errors: "Post not found",
   });
 };
-
 
 //Delete comment
 exports.deleteComment = async (req, res) => {
@@ -66,7 +64,6 @@ exports.deleteComment = async (req, res) => {
   }
 };
 
-
 //edit comment
 exports.editComment = async (req, res) => {
   const user = req.user;
@@ -85,7 +82,7 @@ exports.editComment = async (req, res) => {
         const commentIndex = post.comments.findIndex(
           (comment) => comment.id === commentid
         );
-        post.comments[0].body = body;
+        post.comments[commentIndex].body = body;
         await post.save();
         return res.status(200).json(post);
       }

@@ -28,34 +28,29 @@ io.on("connection", async (socket) => {
   }
 
   socket.on("add_friend", async ({ friendId, username }) => {
+    try {
+      const checkFriend = await User.findById(friendId);
+      const checkUser = await User.findById(user.id);
+
+      if (checkFriend && checkUser) {
+        if (checkUser) {
+          if (checkUser.friends.find((u) => u.user == friendId)) {
+            console.log("already friend");
+            checkUser.friends = checkUser.friends.filter(
+              (f) => f.user != friendId
+            );
+          } else {
+            console.log("friend added");
+            checkUser.friends.unshift({ user: friendId, status: "pending" });
+          }
+          await checkUser.save();
+        } else throw new Error("user not found");
+      }
+    } catch (error) {
+      console.log(error);
+    }
     const friendList = userLists.find((u) => u.userId === friendId);
     if (friendList) {
-      try {
-        const checkFriend = await User.findById(friendId);
-        const checkUser = await User.findById(user.id);
-        // console.log(checkUser);
-
-        if (checkFriend && checkUser) {
-          if (checkUser) {
-            const testCheck = checkUser.friends.find(
-              (u) => u.username == checkFriend.username
-            );
-            console.log(testCheck);
-            if (checkUser.friends.find((u) => u.user == friendId)) {
-              console.log("already friend");
-              checkUser.friends = checkUser.friends.filter(
-                (f) => f.user != friendId
-              );
-            } else {
-              console.log("friend added");
-              checkUser.friends.unshift({ user: friendId, status: "pending" });
-            }
-            await checkUser.save();
-          } else throw new Error("user not found");
-        }
-      } catch (error) {
-        console.log(error);
-      }
       socket.to(friendList.socketId).emit("send_message", username);
     }
   });

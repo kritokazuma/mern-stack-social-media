@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import NavBar from "./components/NavBar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
@@ -9,13 +9,15 @@ import { AuthProvider } from "./context/AuthContext";
 import SinglePost from "./pages/SinglePost";
 import UserPosts from "./pages/UserPosts";
 import axios from "axios";
+import { io } from "socket.io-client";
 import "./App.css";
 
 export const WsContext = React.createContext();
 
-function App() {
-  const token = localStorage.getItem("token");
+const token = localStorage.getItem("token");
+export let socket = io("ws://localhost:4000", { query: `token=${token}` });
 
+function App() {
   axios.defaults.headers.common["Authorization"] = `bearer ${token}`;
 
   return (

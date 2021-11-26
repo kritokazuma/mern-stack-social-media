@@ -20,14 +20,14 @@ import { BsFillPersonPlusFill } from "react-icons/bs";
 import { AiOutlineMessage } from "react-icons/ai";
 import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
-import { io } from "socket.io-client";
+import { socket } from "../App";
 
+// const socket = useRef();
 export const UserPostsContext = React.createContext();
 
 export default function UserPosts() {
   const token = localStorage.getItem("token");
 
-  const socket = useRef();
   const textBg = useColorModeValue("gray.100", "gray.700");
 
   const { user } = useContext(AuthContext);
@@ -44,10 +44,6 @@ export default function UserPosts() {
   const profileImg =
     userPosts.length > 0 ? `/api/${userPosts[0].user.profileImage}` : " ";
 
-  useEffect(() => {
-    socket.current = io("ws://localhost:4000", { query: `token=${token}` });
-  }, []);
-
   //websocket
 
   const [userFromFriendReq, setUserFromFriendReq] = useState("");
@@ -55,7 +51,7 @@ export default function UserPosts() {
   useEffect(() => {
     console.log("test");
 
-    socket.current.on("send_message", (data) => {
+    socket.on("send_message", (data) => {
       if (data) {
         setUserFromFriendReq(data);
         console.log(data);
@@ -64,6 +60,7 @@ export default function UserPosts() {
           position: "top-right",
           description: `${data} requested friend request`,
           isClosable: "true",
+          duration: 15000,
         });
       }
     });
@@ -71,7 +68,7 @@ export default function UserPosts() {
 
   //add friend
   const handleAddFriend = async () => {
-    socket.current.emit("add_friend", {
+    socket.emit("add_friend", {
       friendId: userPosts[0].user._id,
       username: user.username,
     });
