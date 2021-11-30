@@ -6,6 +6,7 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+const { wsController } = require("./controllers/WebSockets/wsFriend.controller");
 
 const app = express();
 
@@ -17,7 +18,9 @@ const io = new Server(server, {
   },
 });
 
-module.exports = io
+wsController(io);
+
+module.exports = io;
 
 app.use("/api/images", express.static(path.join(__dirname, "public/images")));
 

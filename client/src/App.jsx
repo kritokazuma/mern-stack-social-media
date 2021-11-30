@@ -1,24 +1,67 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import NavBar from "./components/NavBar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { Container } from "@chakra-ui/layout";
+import { Container, useToast, Button, Box, Text } from "@chakra-ui/react";
 import { AuthProvider } from "./context/AuthContext";
 import SinglePost from "./pages/SinglePost";
 import UserPosts from "./pages/UserPosts";
 import axios from "axios";
 import { io } from "socket.io-client";
+import Toast from "./components/Toast";
 import "./App.css";
 
 export const WsContext = React.createContext();
 
 const token = localStorage.getItem("token");
-export let socket = io("ws://localhost:4000", { query: `token=${token}` });
+export const socket = io("ws://localhost:4000", { query: `token=${token}` });
 
 function App() {
   axios.defaults.headers.common["Authorization"] = `bearer ${token}`;
+  //websocket
+  const toast = useToast();
+  const toastRef = useRef();
+
+  const [acceptUser, setAcceptUser] = useState("");
+
+  const addToast = (username, userId) => {
+    toastRef.current = toast({
+      title: (
+        <Text>
+          Friend requested by <b>{username}</b>
+        </Text>
+      ),
+      position: "top-right",
+      isClosable: "true",
+      status: "success",
+      duration: 5000,
+      description: <Toast socket={socket} value={{ username, userId }} />,
+    });
+  };
+
+  useEffect(() => {
+    socket.on("send_message", ({ username, userId }) => {
+      addToast(username, userId);
+    });
+    socket.on("accept_noti", (data) => setAcceptUser(data));
+  }, [socket]);
+
+  useEffect(() => {
+    if (acceptUser) {
+      toast({
+        title: `${acceptUser} accepted your friend request`,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }, [acceptUser]);
+
+  socket.on("active_user", (data) => {
+    console.log(data);
+  });
 
   return (
     <Router>

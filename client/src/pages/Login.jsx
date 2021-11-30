@@ -28,10 +28,10 @@ export default function Login(props) {
     "login",
     props
   );
-
+  console.log(errors && Object.keys(errors).length);
   return (
     <>
-      {errors && (
+      {errors && Object.keys(errors).length > 0 && (
         <Center mt={4}>
           <Alert status="error" w="500px">
             <AlertIcon />

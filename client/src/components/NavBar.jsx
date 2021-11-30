@@ -54,7 +54,6 @@ export default function NavBar() {
             </Text>
           </>
         )}
-
         <Box mt={2} w="20px">
           {colorMode === "light" && <FaSun />}
         </Box>

@@ -44,37 +44,21 @@ export default function UserPosts() {
   const profileImg =
     userPosts.length > 0 ? `/api/${userPosts[0].user.profileImage}` : " ";
 
-  //websocket
-
-  const [userFromFriendReq, setUserFromFriendReq] = useState("");
   const toast = useToast();
-  useEffect(() => {
-    console.log("test");
-
-    socket.on("send_message", (data) => {
-      if (data) {
-        setUserFromFriendReq(data);
-        console.log(data);
-        toast({
-          title: `Friend request`,
-          position: "top-right",
-          description: `${data} requested friend request`,
-          isClosable: "true",
-          duration: 15000,
-        });
-      }
-    });
-  }, [socket]);
 
   //add friend
   const handleAddFriend = async () => {
     socket.emit("add_friend", {
       friendId: userPosts[0].user._id,
-      username: user.username,
+      username: userPosts[0].username,
     });
     toast({
-      title: `Friend request`,
-      description: ` requested friend request`,
+      title: `Friend requested successfully`,
+      description: (
+        <Text>
+          friend requested to <b>{userPosts[0].username}</b>
+        </Text>
+      ),
       status: "success",
       isClosable: "true",
     });
