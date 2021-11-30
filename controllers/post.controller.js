@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 //get all posts
 exports.getPosts = async (req, res) => {
@@ -36,29 +37,38 @@ exports.getSinglePost = async (req, res) => {
 
 //get posts of single user
 exports.userPosts = async (req, res) => {
-  const username = req.params.username;
-  const getUserPosts = await Post.find({ username })
-    .populate({
-      path: "user",
-      select: ["profileImage", "friends"],
-      populate: {
-        path: "friends",
+  try {
+    const username = req.params.username;
+    const getUserPosts = await Post.find({ username })
+      .populate({
+        path: "user",
+        select: ["profileImage", "friends"],
+        populate: {
+          path: "friends",
+          populate: {
+            path: "user",
+            select: ["username", "profileImage"],
+          },
+        },
+      })
+      .populate({
+        path: "comments",
         populate: {
           path: "user",
-          select: ["username", "profileImage"],
+          select: "profileImage",
         },
-      },
-    })
-    .populate({
-      path: "comments",
-      populate: {
-        path: "user",
-        select: "profileImage",
-      },
-    });
-  try {
+      });
+    const userFriends = await User.findOne({ username }).populate("friends");
+
     if (getUserPosts) {
-      return res.status(200).json(getUserPosts);
+      return res.status(200).json({
+        user: {
+          username: userFriends.username,
+          profileImage: userFriends.profileImage,
+          friends: userFriends.friends,
+        },
+        posts: getUserPosts,
+      });
     } else {
       return res.status(500).json("user not found");
     }

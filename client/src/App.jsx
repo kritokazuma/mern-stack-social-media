@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { Container, useToast, Button, Box, Text } from "@chakra-ui/react";
+import { Container, useToast, Text } from "@chakra-ui/react";
 import { AuthProvider } from "./context/AuthContext";
 import SinglePost from "./pages/SinglePost";
 import UserPosts from "./pages/UserPosts";
@@ -24,7 +24,8 @@ function App() {
   const toast = useToast();
   const toastRef = useRef();
 
-  const [acceptUser, setAcceptUser] = useState("");
+  const [acceptUser, setAcceptUser] = useState({});
+  const [isAccept, setIsAccept] = useState(false);
 
   const addToast = (username, userId) => {
     toastRef.current = toast({
@@ -37,7 +38,9 @@ function App() {
       isClosable: "true",
       status: "success",
       duration: 5000,
-      description: <Toast socket={socket} value={{ username, userId }} />,
+      description: (
+        <Toast socket={socket} value={{ username, userId, setIsAccept }} />
+      ),
     });
   };
 
@@ -49,9 +52,9 @@ function App() {
   }, [socket]);
 
   useEffect(() => {
-    if (acceptUser) {
+    if (Object.keys(acceptUser).length > 0) {
       toast({
-        title: `${acceptUser} accepted your friend request`,
+        title: `${acceptUser.username} accepted your friend request`,
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -73,7 +76,12 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/posts/:postId" element={<SinglePost />} />
-            <Route path="/posts/user/:username" element={<UserPosts />} />
+            <Route
+              path="/posts/user/:username"
+              element={
+                <UserPosts acceptUser={acceptUser} isAccept={isAccept} />
+              }
+            />
           </Routes>
         </Container>
       </AuthProvider>

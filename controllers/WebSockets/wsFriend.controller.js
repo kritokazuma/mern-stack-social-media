@@ -107,14 +107,14 @@ exports.wsController = (io) => {
             socket.emit("friend_request_status", "accepted");
 
             const friendList = userLists.find((u) => u.userId === data.userId);
-            // console.log(friendList);
-            socket.to(friendList.socketId).emit("accept_noti", user.username);
+            socket
+              .to(friendList.socketId)
+              .emit("accept_noti", { username: user.username, id: user.id });
           }
 
           if (data.status === "rejected") {
             console.log("rejected");
             const makeReject = async (Model, id) => {
-              const getIndex = friendIndex(Model, id);
               Model.friends.splice(friendIndex(Model, id), 1);
               await Model.save();
             };

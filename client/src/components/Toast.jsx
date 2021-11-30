@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Button, Text } from "@chakra-ui/react";
 
-export default function Toast({ socket, value: { username, userId } }) {
+export default function Toast({
+  socket,
+  value: { username, userId, setIsAccept },
+}) {
   const [credentials, setCredentials] = useState({
     userId,
     status: "pending",
@@ -22,6 +25,7 @@ export default function Toast({ socket, value: { username, userId } }) {
       status: "accepted",
     };
     setCredentials(initialStatus);
+    setIsAccept(true);
   };
 
   const handleReject = () => {

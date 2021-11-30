@@ -16,16 +16,15 @@ import {
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BiUpload } from "react-icons/bi";
-import { BsFillPersonPlusFill } from "react-icons/bs";
+import { BsFillPersonPlusFill, BsFillPersonCheckFill } from "react-icons/bs";
 import { AiOutlineMessage } from "react-icons/ai";
 import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
 import { socket } from "../App";
 
-// const socket = useRef();
 export const UserPostsContext = React.createContext();
 
-export default function UserPosts() {
+export default function UserPosts({ acceptUser, isAccept }) {
   const token = localStorage.getItem("token");
 
   const textBg = useColorModeValue("gray.100", "gray.700");
@@ -38,11 +37,17 @@ export default function UserPosts() {
   const [update, setUpdate] = useState(true);
 
   const [userPosts, setUserPosts] = useState([]);
+  const [userDetails, setUserDetail] = useState({});
+  const [isFriend, setIsFriend] = useState(false);
+  const [pending, isPending] = useState(false);
+
   const params = useParams();
 
   const username = params.username;
   const profileImg =
-    userPosts.length > 0 ? `/api/${userPosts[0].user.profileImage}` : " ";
+    userDetails.profileImage !== null
+      ? `/api/${userDetails.profileImage}`
+      : " ";
 
   const toast = useToast();
 
@@ -50,8 +55,16 @@ export default function UserPosts() {
   const handleAddFriend = async () => {
     socket.emit("add_friend", {
       friendId: userPosts[0].user._id,
-      username: userPosts[0].username,
+      username: user.username,
     });
+    if (isFriend) {
+      setIsFriend(false);
+      return toast({
+        title: `Undo friend request`,
+        status: "success",
+        isClosable: "true",
+      });
+    }
     toast({
       title: `Friend requested successfully`,
       description: (
@@ -82,11 +95,25 @@ export default function UserPosts() {
     console.log("i got called");
     try {
       const getPosts = await axios.get(`/api/posts/user/${username}`);
-      setUserPosts(getPosts.data);
+      setUserPosts(getPosts.data.posts);
+      setUserDetail(getPosts.data.user);
     } catch (error) {
       console.log(error);
     }
   }, [update]);
+
+  useEffect(() => {
+    console.log("user post call eff");
+    if (Object.keys(userDetails).length > 0) {
+      const check = userDetails.friends.find((f) => f.user === user.id);
+      setIsFriend(() => (check ? true : false));
+    }
+    if (Object.keys(acceptUser).length > 0) {
+      if (acceptUser.username === userDetails.username) {
+        setIsFriend(true);
+      }
+    }
+  }, [userDetails, acceptUser]);
 
   return (
     <Box>
@@ -104,13 +131,19 @@ export default function UserPosts() {
               verticalAlign="text-bottom"
               colorScheme="teal"
               variant="ghost"
-              icon={<BsFillPersonPlusFill size="1.6rem" />}
+              icon={
+                isFriend || isAccept ? (
+                  <BsFillPersonCheckFill size="1.6rem" />
+                ) : (
+                  <BsFillPersonPlusFill size="1.6rem" />
+                )
+              }
               onClick={handleAddFriend}
             />
           </Box>
         )}
         <Text fontWeight="bold" fontSize="xl" mt={3}>
-          {userPosts.length > 0 && userPosts[0].username}
+          {userDetails && userDetails.username}
         </Text>
         {user && user.username !== username && (
           <Box ml={5} mt={4}>
