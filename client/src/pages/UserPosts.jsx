@@ -105,7 +105,9 @@ export default function UserPosts({ acceptUser, isAccept }) {
   useEffect(() => {
     console.log("user post call eff");
     if (Object.keys(userDetails).length > 0) {
-      const check = userDetails.friends.find((f) => f.user === user.id);
+      const check = user
+        ? userDetails.friends.find((f) => f.user === user.id)
+        : false;
       setIsFriend(() => (check ? true : false));
     }
     if (Object.keys(acceptUser).length > 0) {
