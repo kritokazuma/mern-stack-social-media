@@ -139,7 +139,12 @@ export default function UserPosts({ acceptUser, isAccept }) {
     }
   }, [userDetails, acceptUser]);
 
-  console.log({ isFriend });
+  try {
+    console.log({ isFriend });
+  } catch (error) {
+    console.log(error);
+  }
+  y;
 
   return (
     <Box>
