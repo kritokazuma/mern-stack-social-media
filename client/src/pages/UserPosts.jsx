@@ -12,11 +12,13 @@ import {
   useColorModeValue,
   IconButton,
   useToast,
+  Button,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BiUpload } from "react-icons/bi";
 import { BsFillPersonPlusFill, BsFillPersonCheckFill } from "react-icons/bs";
+import { MdCancelScheduleSend } from "react-icons/md";
 import { AiOutlineMessage } from "react-icons/ai";
 import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
@@ -38,8 +40,10 @@ export default function UserPosts({ acceptUser, isAccept }) {
 
   const [userPosts, setUserPosts] = useState([]);
   const [userDetails, setUserDetail] = useState({});
-  const [isFriend, setIsFriend] = useState(false);
-  const [pending, isPending] = useState(false);
+  const [isFriend, setIsFriend] = useState({
+    isFriend: false,
+    status: "",
+  });
 
   const params = useParams();
 
@@ -57,8 +61,19 @@ export default function UserPosts({ acceptUser, isAccept }) {
       friendId: userPosts[0].user._id,
       username: user.username,
     });
-    if (isFriend) {
-      setIsFriend(false);
+    if (!isFriend.status) {
+      setIsFriend((preVal) => {
+        return {
+          ...preVal,
+          status: "pending",
+        };
+      });
+    }
+    if (isFriend.status === "pending" || isFriend.isFriend) {
+      setIsFriend({
+        isFriend: false,
+        status: "",
+      });
       return toast({
         title: `Undo friend request`,
         status: "success",
@@ -108,14 +123,23 @@ export default function UserPosts({ acceptUser, isAccept }) {
       const check = user
         ? userDetails.friends.find((f) => f.user === user.id)
         : false;
-      setIsFriend(() => (check ? true : false));
+      console.log(check);
+      setIsFriend({
+        isFriend: check && check.status !== "pending" ? true : false,
+        status: check && check !== false ? check.status : " ",
+      });
     }
     if (Object.keys(acceptUser).length > 0) {
       if (acceptUser.username === userDetails.username) {
-        setIsFriend(true);
+        setIsFriend({
+          isFriend: true,
+          status: "accepted",
+        });
       }
     }
   }, [userDetails, acceptUser]);
+
+  console.log({ isFriend });
 
   return (
     <Box>
@@ -134,7 +158,9 @@ export default function UserPosts({ acceptUser, isAccept }) {
               colorScheme="teal"
               variant="ghost"
               icon={
-                isFriend || isAccept ? (
+                isFriend.status === "pending" ? (
+                  <MdCancelScheduleSend size="1.6rem" />
+                ) : isFriend.isFriend || isAccept ? (
                   <BsFillPersonCheckFill size="1.6rem" />
                 ) : (
                   <BsFillPersonPlusFill size="1.6rem" />
