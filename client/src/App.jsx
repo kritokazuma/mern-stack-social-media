@@ -45,6 +45,7 @@ function App() {
   };
 
   useEffect(() => {
+    //will accept friend id
     socket.on("send_message", ({ username, userId }) => {
       addToast(username, userId);
     });

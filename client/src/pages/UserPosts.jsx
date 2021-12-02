@@ -12,14 +12,14 @@ import {
   useColorModeValue,
   IconButton,
   useToast,
-  Button,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BiUpload } from "react-icons/bi";
 import { BsFillPersonPlusFill, BsFillPersonCheckFill } from "react-icons/bs";
-import { MdCancelScheduleSend } from "react-icons/md";
+import { MdCancelScheduleSend, MdOutlineCancel } from "react-icons/md";
 import { AiOutlineMessage } from "react-icons/ai";
+import { IoCheckmark } from "react-icons/io5";
 import Posts from "../components/Posts";
 import { AuthContext } from "../context/AuthContext";
 import { socket } from "../App";
@@ -33,17 +33,22 @@ export default function UserPosts({ acceptUser, isAccept }) {
 
   const { user } = useContext(AuthContext);
 
+  //photo upload hooks
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("Upload a new profile picture");
 
+  //update the component
   const [update, setUpdate] = useState(true);
 
+  //hooks fetch from user posts
   const [userPosts, setUserPosts] = useState([]);
   const [userDetails, setUserDetail] = useState({});
   const [isFriend, setIsFriend] = useState({
     isFriend: false,
     status: "",
+    action: "",
   });
+  //end of hooks fetch from user
 
   const params = useParams();
 
@@ -70,9 +75,12 @@ export default function UserPosts({ acceptUser, isAccept }) {
       });
     }
     if (isFriend.status === "pending" || isFriend.isFriend) {
-      setIsFriend({
-        isFriend: false,
-        status: "",
+      setIsFriend((preVal) => {
+        return {
+          ...preVal,
+          isFriend: false,
+          status: "",
+        };
       });
       return toast({
         title: `Undo friend request`,
@@ -127,17 +135,31 @@ export default function UserPosts({ acceptUser, isAccept }) {
       setIsFriend({
         isFriend: check && check.status !== "pending" ? true : false,
         status: check && check !== false ? check.status : " ",
+        action: check && check !== false ? check.action : " ",
       });
     }
     if (Object.keys(acceptUser).length > 0) {
       if (acceptUser.username === userDetails.username) {
-        setIsFriend({
-          isFriend: true,
-          status: "accepted",
+        setIsFriend((preVal) => {
+          return {
+            ...preVal,
+            isFriend: true,
+            status: "accepted",
+          };
         });
       }
     }
   }, [userDetails, acceptUser]);
+
+  const acceptOrNot = (action, make) => {
+    socket.emit("accept_friend", {
+      userId: userDetails.id,
+      status: action,
+    });
+    setIsFriend((preVal) => {
+      return { ...preVal, isFriend: make, status: action };
+    });
+  };
 
   return (
     <Box>
@@ -151,21 +173,39 @@ export default function UserPosts({ acceptUser, isAccept }) {
       <Flex alignItems="center" justifyContent="center">
         {user && user.username !== username && (
           <Box mr={5} mt={4}>
-            <IconButton
-              verticalAlign="text-bottom"
-              colorScheme="teal"
-              variant="ghost"
-              icon={
-                isFriend.status === "pending" ? (
-                  <MdCancelScheduleSend size="1.6rem" />
-                ) : isFriend.isFriend || isAccept ? (
-                  <BsFillPersonCheckFill size="1.6rem" />
-                ) : (
-                  <BsFillPersonPlusFill size="1.6rem" />
-                )
-              }
-              onClick={handleAddFriend}
-            />
+            {isFriend.action === "requested" &&
+            isFriend.status === "pending" ? (
+              <>
+                <IconButton
+                  variant="ghost"
+                  colorScheme="teal"
+                  onClick={() => acceptOrNot("accepted", true)}
+                  icon={<IoCheckmark size="1.4rem" />}
+                />
+                <IconButton
+                  variant="ghost"
+                  colorScheme="teal"
+                  onClick={() => acceptOrNot("rejected", false)}
+                  icon={<MdOutlineCancel size="1.4rem" />}
+                />
+              </>
+            ) : (
+              <IconButton
+                verticalAlign="text-bottom"
+                colorScheme="teal"
+                variant="ghost"
+                icon={
+                  isFriend.status === "pending" ? (
+                    <MdCancelScheduleSend size="1.6rem" />
+                  ) : isFriend.isFriend || isAccept ? (
+                    <BsFillPersonCheckFill size="1.6rem" />
+                  ) : (
+                    <BsFillPersonPlusFill size="1.6rem" />
+                  )
+                }
+                onClick={handleAddFriend}
+              />
+            )}
           </Box>
         )}
         <Text fontWeight="bold" fontSize="xl" mt={3}>

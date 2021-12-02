@@ -63,6 +63,7 @@ exports.userPosts = async (req, res) => {
     if (getUserPosts) {
       return res.status(200).json({
         user: {
+          id: userFriends.id,
           username: userFriends.username,
           profileImage: userFriends.profileImage,
           friends: userFriends.friends,

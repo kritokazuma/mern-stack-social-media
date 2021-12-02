@@ -19,20 +19,18 @@ export default function Toast({
     [status]
   );
 
+  const initialStatus = (action) => {
+    return { userId, status: action };
+  };
+
   const handleAccept = async () => {
-    const initialStatus = {
-      userId,
-      status: "accepted",
-    };
-    setCredentials(initialStatus);
+    setCredentials(initialStatus("accepted"));
     setIsAccept(true);
   };
 
   const handleReject = () => {
-    setCredentials((preVal) => {
-      return { ...preVal, status: "rejected" };
-    });
-    socket.emit("accept_friend", credentials);
+    setCredentials(initialStatus("rejected"));
+    setIsAccept(false);
   };
 
   useEffect(() => {

@@ -72,6 +72,7 @@ exports.wsController = (io) => {
 
             socket
               .to(friendList.socketId)
+              //send user id
               .emit("send_message", { username, userId: user.id });
           }
           await checkUser.save();
