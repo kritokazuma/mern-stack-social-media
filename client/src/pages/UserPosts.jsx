@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import {
   Box,
   Wrap,
@@ -40,7 +40,7 @@ export default function UserPosts({ acceptUser, isAccept }) {
   //update the component
   const [update, setUpdate] = useState(true);
 
-  //hooks fetch from user posts
+  /*-----------hooks fetch from user posts-------------*/
   const [userPosts, setUserPosts] = useState([]);
   const [userDetails, setUserDetail] = useState({});
   const [isFriend, setIsFriend] = useState({
@@ -48,11 +48,15 @@ export default function UserPosts({ acceptUser, isAccept }) {
     status: "",
     action: "",
   });
-  //end of hooks fetch from user
 
+  console.log(userPosts);
+  /*-----------hooks fetch from user posts-------------*/
+
+  /*------------username from params-----------------*/
   const params = useParams();
-
   const username = params.username;
+  /*------------End of username from params-----------------*/
+
   const profileImg =
     userDetails.profileImage !== null
       ? `/api/${userDetails.profileImage}`
@@ -60,13 +64,13 @@ export default function UserPosts({ acceptUser, isAccept }) {
 
   const toast = useToast();
 
-  //add friend
-  const handleAddFriend = async () => {
+  /*------------add firend---------------- */
+  const handleAddFriend = useCallback(async () => {
     socket.emit("add_friend", {
       friendId: userPosts[0].user._id,
       username: user.username,
     });
-    if (!isFriend.status) {
+    if (!isFriend.status && !isFriend.action) {
       setIsFriend((preVal) => {
         return {
           ...preVal,
@@ -74,7 +78,11 @@ export default function UserPosts({ acceptUser, isAccept }) {
         };
       });
     }
-    if (isFriend.status === "pending" || isFriend.isFriend) {
+    if (
+      isFriend.status === "pending" ||
+      isFriend.status === "accepted" ||
+      isFriend.isFriend
+    ) {
       setIsFriend((preVal) => {
         return {
           ...preVal,
@@ -92,15 +100,16 @@ export default function UserPosts({ acceptUser, isAccept }) {
       title: `Friend requested successfully`,
       description: (
         <Text>
-          friend requested to <b>{userPosts[0].username}</b>
+          friend requested to <b>{userDetails && userDetails.username}</b>
         </Text>
       ),
       status: "success",
       isClosable: "true",
     });
-  };
+  }, [isFriend]);
+  /*------------end of add firend---------------- */
 
-  //upload a photo
+  /*----------photo upload function-----------*/
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -113,7 +122,9 @@ export default function UserPosts({ acceptUser, isAccept }) {
     console.log(res.data);
     setUpdate(!update);
   };
+  /*----------end-----------*/
 
+  /*---------fetch user posts------------- */
   useEffect(async () => {
     console.log("i got called");
     try {
@@ -124,20 +135,31 @@ export default function UserPosts({ acceptUser, isAccept }) {
       console.log(error);
     }
   }, [update]);
+  /*-------end of fetch user posts------------*/
 
+  /*--------------Update isFriend Hook---------------- */
   useEffect(() => {
     console.log("user post call eff");
+    /*---------check friend status from userDetails-------- */
     if (Object.keys(userDetails).length > 0) {
       const check = user
         ? userDetails.friends.find((f) => f.user === user.id)
         : false;
+
+      //function to add status and action
+      const addDetail = (state) => {
+        return check && check !== false ? check[state] : " ";
+      };
       console.log(check);
       setIsFriend({
         isFriend: check && check.status !== "pending" ? true : false,
-        status: check && check !== false ? check.status : " ",
-        action: check && check !== false ? check.action : " ",
+        status: addDetail("status"),
+        action: addDetail("action"),
       });
     }
+    /*------------------------end------------------------- */
+
+    //when accept socket return
     if (Object.keys(acceptUser).length > 0) {
       if (acceptUser.username === userDetails.username) {
         setIsFriend((preVal) => {
@@ -151,15 +173,19 @@ export default function UserPosts({ acceptUser, isAccept }) {
     }
   }, [userDetails, acceptUser]);
 
-  const acceptOrNot = (action, make) => {
-    socket.emit("accept_friend", {
-      userId: userDetails.id,
-      status: action,
-    });
-    setIsFriend((preVal) => {
-      return { ...preVal, isFriend: make, status: action };
-    });
-  };
+  const acceptOrNot = useCallback(
+    (action, make) => {
+      socket.emit("accept_friend", {
+        userId: userDetails.id,
+        status: action,
+      });
+      setIsFriend((preVal) => {
+        return { ...preVal, isFriend: make, status: action };
+      });
+    },
+    [isFriend]
+  );
+  /*--------------End of update isFriend Hook---------------- */
 
   return (
     <Box>

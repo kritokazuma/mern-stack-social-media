@@ -1,17 +1,13 @@
 import React, { useEffect, useState, useContext } from "react";
 import {
-  Heading,
-  Center,
   Box,
   Grid,
-  Flex,
-  Spinner,
   Tabs,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
-  IconButton,
+  Progress,
 } from "@chakra-ui/react";
 import axios from "axios";
 import Posts from "../components/Posts";
@@ -19,7 +15,8 @@ import { AuthContext } from "../context/AuthContext";
 import CreatePost from "../components/CreatePost";
 import { BiHome, BiMessageRoundedMinus } from "react-icons/bi";
 import { IoNotificationsOutline } from "react-icons/io5";
-import MessagePanel from "../components/MessagePanel";
+import MessagePanel from "./MessagePanel";
+import Notifications from "./Notifications";
 
 export const HomeContext = React.createContext();
 
@@ -28,9 +25,17 @@ export default function Home() {
 
   const { user } = useContext(AuthContext);
 
+  const [percentage, setPercentage] = useState(0);
+
   useEffect(async () => {
     try {
-      const getPosts = await axios.get("/api/posts");
+      const getPosts = await axios.get("/api/posts", {
+        onDownloadProgress: (progress) => {
+          setPercentage(
+            parseInt(Math.round((progress.loaded * 100) / progress.total))
+          );
+        },
+      });
       setPosts(getPosts.data);
       console.log("called");
     } catch (error) {
@@ -38,13 +43,9 @@ export default function Home() {
     }
   }, []);
 
-  // if (posts.length === 0) {
-  //   return (
-  //     <Flex height="100vh" alignItems="center" justifyContent="center">
-  //       <Spinner size="xl" />
-  //     </Flex>
-  //   );
-  // }
+  if (percentage < 100) {
+    return <Progress mt={7} size='xs' isIndeterminate />;
+  }
 
   return (
     <Box pt={5}>
@@ -83,6 +84,9 @@ export default function Home() {
           </TabPanel>
           <TabPanel>
             <MessagePanel />
+          </TabPanel>
+          <TabPanel>
+            <Notifications />
           </TabPanel>
         </TabPanels>
       </Tabs>
