@@ -123,7 +123,6 @@ exports.wsController = (io) => {
           }
 
           if (data.status === "rejected") {
-            console.log("rejected");
             const makeReject = async (Model, id) => {
               Model.friends.splice(friendIndex(Model, id), 1);
               await Model.save();

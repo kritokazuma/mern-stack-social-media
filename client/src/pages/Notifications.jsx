@@ -8,8 +8,8 @@ const Notifications = () => {
 
   const [friends, setFriends] = useState([]);
   const [newFriends, setNewFriends] = useState({});
+  const [acceptUser, setAcceptUser] = useState([]);
 
-  console.log(friends);
   useEffect(() => {
     socket.on("notification", (data) => {
       setNewFriends(data.value);
@@ -35,16 +35,45 @@ const Notifications = () => {
     }
   }, []);
 
+  const acceptOrNot = (id, status) => {
+    socket.emit("accept_friend", {
+      userId: id,
+      status,
+    });
+    setAcceptUser((preVal) => [...preVal, { id, status }]);
+  };
+  const isAccept = (id) => acceptUser.find((u) => u.id === id);
+  console.log(friends);
   return (
     <Box>
       {friends.map((f) => (
         <Box key={f.user} p={5} borderWidth="1px" borderRadius="lg">
           <Text>Friend requested from {f.username}</Text>
           <Box mt={2}>
-            <Button size="sm" mr={4} colorScheme="teal">
-              Accept
-            </Button>
-            <Button size="sm">Cancel</Button>
+            {isAccept(f.user) ? (
+              isAccept(f.user).status === "accepted" ? (
+                <Text>Friend accepted successfully</Text>
+              ) : (
+                <Text>Friend rejected successfully</Text>
+              )
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  mr={4}
+                  colorScheme="teal"
+                  onClick={() => acceptOrNot(f.user, "accepted")}
+                >
+                  Accept
+                </Button>
+                <Button
+                  onClick={() => acceptOrNot(f.user, "rejected")}
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+              </>
+            )}
           </Box>
         </Box>
       ))}
