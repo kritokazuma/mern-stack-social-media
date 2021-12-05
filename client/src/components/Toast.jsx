@@ -10,7 +10,7 @@ export default function Toast({
     status: "pending",
   });
 
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState({});
 
   const respStatus = useCallback(
     (resp) => {
@@ -46,9 +46,9 @@ export default function Toast({
 
   return (
     <Box w="100%" mt={1}>
-      {status ? (
-        status === "accepted" ? (
-          <Text>accepted</Text>
+      {Object.keys(status).length > 0 && status.friendId === userId ? (
+        status.status === "accepted" ? (
+          <Text>Accepted</Text>
         ) : (
           <Text>Rejected</Text>
         )

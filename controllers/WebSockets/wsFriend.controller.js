@@ -74,6 +74,12 @@ exports.wsController = (io) => {
               .to(friendList.socketId)
               //send user id
               .emit("send_message", { username, userId: user.id });
+
+            const fri = addFriendList(friendId, username, "requested");
+            socket
+              .to(friendList.socketId)
+              //send user id
+              .emit("notification", { value: fri });
           }
           await checkUser.save();
           await checkFriend.save();
@@ -105,7 +111,10 @@ exports.wsController = (io) => {
 
             makeAccept(friend, user.id);
             makeAccept(userFriend, data.userId);
-            socket.emit("friend_request_status", "accepted");
+            socket.emit("friend_request_status", {
+              status: "accepted",
+              friendId: data.userId,
+            });
 
             const friendList = userLists.find((u) => u.userId === data.userId);
             socket

@@ -70,7 +70,8 @@ export default function UserPosts({ acceptUser, isAccept }) {
       friendId: userPosts[0].user._id,
       username: user.username,
     });
-    if (!isFriend.status && !isFriend.action) {
+    if (!isFriend.status && !isFriend.isFriend) {
+      console.log("add");
       setIsFriend((preVal) => {
         return {
           ...preVal,

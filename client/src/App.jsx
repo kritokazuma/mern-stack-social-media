@@ -69,23 +69,25 @@ function App() {
 
   return (
     <Router>
-      <AuthProvider>
-        <NavBar />
-        <Container maxWidth="container.lg">
-          <Routes>
-            <Route path="/" element={<Home />} render={<NavBar />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/posts/:postId" element={<SinglePost />} />
-            <Route
-              path="/posts/user/:username"
-              element={
-                <UserPosts acceptUser={acceptUser} isAccept={isAccept} />
-              }
-            />
-          </Routes>
-        </Container>
-      </AuthProvider>
+      <WsContext.Provider value={{ socket }}>
+        <AuthProvider>
+          <NavBar />
+          <Container maxWidth="container.lg">
+            <Routes>
+              <Route path="/" element={<Home />} render={<NavBar />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/posts/:postId" element={<SinglePost />} />
+              <Route
+                path="/posts/user/:username"
+                element={
+                  <UserPosts acceptUser={acceptUser} isAccept={isAccept} />
+                }
+              />
+            </Routes>
+          </Container>
+        </AuthProvider>
+      </WsContext.Provider>
     </Router>
   );
 }
