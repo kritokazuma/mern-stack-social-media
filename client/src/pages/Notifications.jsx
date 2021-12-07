@@ -40,6 +40,7 @@ const Notifications = () => {
       userId: id,
       status,
     });
+    console.log({ id, status });
     setAcceptUser((preVal) => [...preVal, { id, status }]);
   };
   const isAccept = (id) => acceptUser.find((u) => u.id === id);
