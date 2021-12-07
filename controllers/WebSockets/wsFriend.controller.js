@@ -1,5 +1,6 @@
 const User = require("../../models/User");
 const { validateToken } = require("../../utils/wsJwtVerify");
+const { wsMessage } = require("./wsMessage.controller");
 
 exports.wsController = (io) => {
   let userLists = [];
@@ -142,5 +143,8 @@ exports.wsController = (io) => {
       console.log("user disconnect");
       io.emit("active_user", userLists);
     });
+
+    //message controller
+    wsMessage(socket, userLists, user);
   });
 };

@@ -14,7 +14,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { BiUpload } from "react-icons/bi";
 import { BsFillPersonPlusFill, BsFillPersonCheckFill } from "react-icons/bs";
 import { MdCancelScheduleSend, MdOutlineCancel } from "react-icons/md";
@@ -54,6 +54,7 @@ export default function UserPosts({ acceptUser, isAccept }) {
   /*------------username from params-----------------*/
   const params = useParams();
   const username = params.username;
+
   /*------------End of username from params-----------------*/
 
   const profileImg =
@@ -240,6 +241,8 @@ export default function UserPosts({ acceptUser, isAccept }) {
         {user && user.username !== username && (
           <Box ml={5} mt={4}>
             <IconButton
+              as={Link}
+              to={`/${userDetails.id}/messages`}
               verticalAlign="text-bottom"
               colorScheme="teal"
               variant="ghost"

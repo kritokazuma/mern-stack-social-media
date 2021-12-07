@@ -9,7 +9,7 @@ import {
   Wrap,
   Avatar,
 } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import LikeButton from "../components/LikeButton";
@@ -40,9 +40,10 @@ export default function SinglePost() {
     fetchPost();
   }, []);
 
-
   const profileImg =
-    post && post.user.profileImage !== null ? `/api/${post.user.profileImage}` : " ";
+    post && post.user.profileImage !== null
+      ? `/api/${post.user.profileImage}`
+      : " ";
   if (!post) {
     return (
       <Flex height="100vh" alignItems="center" justifyContent="center">
@@ -70,7 +71,12 @@ export default function SinglePost() {
             </Wrap>
           </Box>
           <Box ml={4}>
-            <Text fontWeight="bold" fontSize="lg">
+            <Text
+              fontWeight="bold"
+              fontSize="lg"
+              as={Link}
+              to={`/posts/user/${post.username}`}
+            >
               {post.username}
             </Text>
             <Text isTruncated={true} color="gray.500">

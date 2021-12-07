@@ -8,6 +8,7 @@ import { Container, useToast, Text } from "@chakra-ui/react";
 import { AuthProvider } from "./context/AuthContext";
 import SinglePost from "./pages/SinglePost";
 import UserPosts from "./pages/UserPosts";
+import SingleMessage from "./pages/SingleMessage";
 import axios from "axios";
 import { io } from "socket.io-client";
 import Toast from "./components/Toast";
@@ -84,6 +85,7 @@ function App() {
                   <UserPosts acceptUser={acceptUser} isAccept={isAccept} />
                 }
               />
+              <Route path="/:user/messages" element={<SingleMessage />} />
             </Routes>
           </Container>
         </AuthProvider>
