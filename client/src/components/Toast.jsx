@@ -46,8 +46,10 @@ export default function Toast({
 
   return (
     <Box w="100%" mt={1}>
-      {Object.keys(status).length > 0 && status.friendId === userId ? (
-        status.status === "accepted" ? (
+      {Object.keys(status).length > 0 ||
+      credentials.status !== "pending" ||
+      status.friendId === userId ? (
+        credentials.status === "accepted" ? (
           <Text>Accepted</Text>
         ) : (
           <Text>Rejected</Text>

@@ -49,7 +49,6 @@ export default function UserPosts({ acceptUser, isAccept }) {
     action: "",
   });
 
-  console.log(userPosts);
   /*-----------hooks fetch from user posts-------------*/
 
   /*------------username from params-----------------*/
@@ -66,11 +65,11 @@ export default function UserPosts({ acceptUser, isAccept }) {
 
   /*------------add firend---------------- */
   const handleAddFriend = useCallback(async () => {
-    socket.emit("add_friend", {
+    await socket.emit("add_friend", {
       friendId: userPosts[0].user._id,
       username: user.username,
     });
-    if (!isFriend.status && !isFriend.isFriend) {
+    if (!isFriend.status || !isFriend.isFriend) {
       console.log("add");
       setIsFriend((preVal) => {
         return {
