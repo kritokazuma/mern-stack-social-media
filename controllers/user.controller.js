@@ -33,8 +33,6 @@ exports.login = async (req, res) => {
   //find is user registered or not
   const user = await User.findOne({ username });
 
-  console.log(user);
-
   //if register or not, check hash password
   const validatePassword = !user
     ? false

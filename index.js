@@ -6,7 +6,9 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const { wsController } = require("./controllers/WebSockets/wsFriend.controller");
+const {
+  wsController,
+} = require("./controllers/WebSockets/wsFriend.controller");
 
 const app = express();
 
@@ -35,6 +37,7 @@ connectDB();
 app.use("/api", require("./routes/Post"));
 app.use("/api/users", require("./routes/User"));
 app.use("/api/profile", require("./routes/Images"));
+app.use("/api/conservation", require("./routes/Messages"));
 
 const port = process.env.PORT;
 

@@ -5,15 +5,23 @@ exports.wsMessage = (socket, userLists, user) => {
     const checkConservation = await Message.findOne({
       $or: [
         {
-          "participants.user1.username": user.username,
-          "participants.user2.username": data.friendUsername,
+          "participants.user1.id": user.id,
+          "participants.user2.id": data.friendId,
         },
         {
-          "participants.user1.username": data.friendUsername,
-          "participants.user2.username": user.username,
+          "participants.user1.id": data.friendId,
+          "participants.user2.id": user.id,
         },
       ],
     });
+    const friendList = userLists.find((u) => u.userId === data.friendId);
+
+    const sendMessage = (id) =>
+      socket.to(id).emit("received_message", {
+        username: user.username,
+        id: user.id,
+        message: data.message,
+      });
 
     if (checkConservation) {
       checkConservation.messages.push({
@@ -21,7 +29,9 @@ exports.wsMessage = (socket, userLists, user) => {
         message: data.message,
       });
 
-      return await checkConservation.save();
+      await checkConservation.save();
+
+      return sendMessage(friendList.socketId);
     }
 
     const message = new Message({
@@ -39,6 +49,7 @@ exports.wsMessage = (socket, userLists, user) => {
 
     try {
       await message.save();
+      return sendMessage(friendList.socketId);
     } catch (error) {
       console.log(error);
     }
