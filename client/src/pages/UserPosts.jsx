@@ -242,7 +242,7 @@ export default function UserPosts({ acceptUser, isAccept }) {
           <Box ml={5} mt={4}>
             <IconButton
               as={Link}
-              to={`/${userDetails.id}/messages`}
+              to={`/${userDetails.id}/messages?user=${userDetails.username}`}
               verticalAlign="text-bottom"
               colorScheme="teal"
               variant="ghost"
