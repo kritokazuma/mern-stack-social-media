@@ -1,7 +1,6 @@
 const Message = require("../../models/Message");
 
 exports.wsMessage = (socket, userLists, user) => {
-  console.log(user);
   socket.on("sendToMessage", async (data) => {
     const conservation = await Message.findOne({
       $or: [
@@ -10,7 +9,8 @@ exports.wsMessage = (socket, userLists, user) => {
       ],
     });
     const friendList = userLists.filter((u) => u.userId === data.friendId);
-    console.log({ friendList });
+    const mySocket = userLists.filter((u) => u.userId === user.id);
+
     const sendMessage = (id) =>
       socket.to(id).emit("received_message", {
         username: user.username,
@@ -26,7 +26,12 @@ exports.wsMessage = (socket, userLists, user) => {
 
       await conservation.save();
 
-      return sendMessage(friendList.socketId);
+      mySocket.forEach((list) => {
+        sendMessage(list.socketId);
+      });
+      return friendList.forEach((list) => {
+        sendMessage(list.socketId);
+      });
     }
 
     const message = new Message({
@@ -41,7 +46,13 @@ exports.wsMessage = (socket, userLists, user) => {
 
     try {
       await message.save();
-      return sendMessage(friendList.socketId);
+
+      mySocket.forEach((list) => {
+        sendMessage(list.socketId);
+      });
+      return friendList.forEach((list) => {
+        sendMessage(list.socketId);
+      });
     } catch (error) {
       console.log(error);
     }

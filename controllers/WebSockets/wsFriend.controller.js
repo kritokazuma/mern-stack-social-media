@@ -9,7 +9,7 @@ exports.wsController = (io) => {
 
     //add socket.id to array
     const activeUser = (userId, socketId) => {
-      !userLists.some((u) => u.userId === userId) &&
+      !userLists.some((u) => u.socketId === socketId) &&
         userLists.push({ userId, socketId });
     };
 
@@ -26,10 +26,27 @@ exports.wsController = (io) => {
     try {
       user = await validateToken(token);
       activeUser(user.id, socket.id);
+      console.log({ userLists });
       io.emit("active_user", userLists);
     } catch (error) {
       console.log(error);
     }
+
+    socket.on("disconnect", () => {
+      removeUser(socket.id);
+      console.log({ userLists });
+      console.log("user disconnect");
+      io.emit("active_user", userLists);
+    });
+
+    socket.on("is_active", (data) => {
+      const checkFriend = userLists.filter((u) => u.userId === data.id);
+      console.log(userLists);
+      if (Object.keys(checkFriend).length > 0) {
+        return socket.emit("active_status", true);
+      }
+      return socket.emit("active_status", false);
+    });
 
     //add friend socket
     socket.on("add_friend", async ({ friendId, username }) => {
@@ -136,12 +153,6 @@ exports.wsController = (io) => {
       } catch (error) {
         console.log(error);
       }
-    });
-
-    socket.on("disconnect", () => {
-      removeUser(socket.id);
-      console.log("user disconnect");
-      io.emit("active_user", userLists);
     });
 
     //message controller

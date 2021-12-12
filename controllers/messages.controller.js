@@ -1,38 +1,13 @@
 const Message = require("../models/Message");
+const User = require("../models/User");
+const { userLists } = require("./WebSockets/wsFriend.controller");
 
 exports.messageLists = async (req, res) => {
   const user = req.user;
   const friendId = req.params.friend;
   const username = req.query.user;
-
-  // const populateHandler = (user) => {
-  //   return {
-  //     path: "participants",
-  //     populate: {
-  //       path: user,
-  //       populate: {
-  //         path: "id",
-  //         select: "profileImage",
-  //       },
-  //     },
-  //   };
-  // };
+  console.log({ userLists });
   try {
-    // const message = await Message.findOne({
-    //   $or: [
-    //     {
-    //       "participants.user1.id": user.id,
-    //       "participants.user2.id": friendId,
-    //     },
-    //     {
-    //       "participants.user1.id": friendId,
-    //       "participants.user2.id": user.id,
-    //     },
-    //   ],
-    // })
-    //   .populate(populateHandler("user1"))
-    //   .populate(populateHandler("user2"));
-
     const message = await Message.findOne({
       $or: [
         { participants: [friendId, user.id] },
@@ -40,7 +15,16 @@ exports.messageLists = async (req, res) => {
       ],
     });
 
-    if (message) return res.status(200).json({ message });
+    const friend = await User.findById(friendId);
+
+    if (message && friend)
+      return res.status(200).json({
+        friendDetails: {
+          profileImage: friend.profileImage,
+          username: friend.username,
+        },
+        message,
+      });
     return res.status(200).json({ message: false });
   } catch (error) {
     res.status(501).json(error);
