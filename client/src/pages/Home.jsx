@@ -36,6 +36,7 @@ export default function Home() {
           );
         },
       });
+      console.log(getPosts);
       setPosts(getPosts.data);
       console.log("called");
     } catch (error) {
@@ -44,7 +45,7 @@ export default function Home() {
   }, []);
 
   if (percentage < 100) {
-    return <Progress mt={7} size='xs' isIndeterminate />;
+    return <Progress mt={7} size="xs" isIndeterminate />;
   }
 
   return (

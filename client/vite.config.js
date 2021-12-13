@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://shrouded-atoll-71846.herokuapp.com/",
+        target: "https://shrouded-atoll-71846.herokuapp.com",
         rewrite: (path) => path.replace("/^/api/", ""),
       },
       "/ws": {
