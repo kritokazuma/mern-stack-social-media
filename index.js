@@ -42,6 +42,6 @@ app.use("/api/users", require("./routes/User"));
 app.use("/api/profile", require("./routes/Images"));
 app.use("/api/conservation", require("./routes/Messages"));
 
-const port = process.env.PORT;
+const port = process.env.PORT || 4000;
 
 server.listen(port, () => console.log(`server is running on port ${port}`));
