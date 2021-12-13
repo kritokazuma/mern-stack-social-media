@@ -17,7 +17,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "react": "^17.0.0",
-    "react-custom-scrollbars": "^4.2.1",
+    "react-custom-scrollbars-2": "^4.4.0",
     "react-dom": "^17.0.0",
     "react-icons": "^4.3.1",
     "react-router-dom": "^6.0.2",

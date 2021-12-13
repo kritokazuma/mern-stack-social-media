@@ -12,7 +12,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useSearchParams } from "react-router-dom";
-import { Scrollbars } from "react-custom-scrollbars";
+import { Scrollbars } from "react-custom-scrollbars-2";
 import Messages from "../components/Messages";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
@@ -50,14 +50,18 @@ export default function SingleMessage() {
         )}`
       );
 
-      setMessage((preVal) => {
-        return {
-          ...preVal,
-          participants: res.data.message.participants,
-          messages: res.data.message.messages,
-        };
-      });
-      setFriendDetails(res.data.friendDetails);
+      if (res) {
+        setMessage((preVal) => {
+          return {
+            ...preVal,
+            participants: res.data.message.participants,
+            messages: res.data.message.messages,
+          };
+        });
+        setFriendDetails(res.data.friendDetails);
+
+        scrollBar.current && scrollBar.current.scrollToBottom();
+      }
 
       //websocket
       socket.emit("is_active", { id: friendId });
@@ -69,7 +73,6 @@ export default function SingleMessage() {
   }, [socket]);
 
   // scrollBar.current.scrollToBottom();
-  console.log(scrollBar.current);
   const handleSubmit = (e) => {
     e.preventDefault();
   };
@@ -104,6 +107,7 @@ export default function SingleMessage() {
           borderRadius: "10px",
           marginTop: "10px",
         }}
+        name="hihi"
         ref={scrollBar}
       >
         {message.messages.map((mes, i) => (
