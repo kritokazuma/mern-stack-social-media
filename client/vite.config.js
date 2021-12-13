@@ -11,7 +11,7 @@ export default defineConfig({
         rewrite: (path) => path.replace("/^/api/", ""),
       },
       "/ws": {
-        target: "https://shrouded-atoll-71846.herokuapp.com/",
+        target: "ws://localhost:4000",
         changeOrigin: false,
       },
     },

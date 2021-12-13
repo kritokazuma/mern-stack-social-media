@@ -29,13 +29,16 @@ export default function Home() {
 
   useEffect(async () => {
     try {
-      const getPosts = await axios.get("/api/posts", {
-        onDownloadProgress: (progress) => {
-          setPercentage(
-            parseInt(Math.round((progress.loaded * 100) / progress.total))
-          );
-        },
-      });
+      const getPosts = await axios.get(
+        "https://shrouded-atoll-71846.herokuapp.com/api/posts",
+        {
+          onDownloadProgress: (progress) => {
+            setPercentage(
+              parseInt(Math.round((progress.loaded * 100) / progress.total))
+            );
+          },
+        }
+      );
       console.log(getPosts);
       setPosts(getPosts.data);
       console.log("called");
