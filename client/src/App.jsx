@@ -17,7 +17,9 @@ import "./App.css";
 export const WsContext = React.createContext();
 
 const token = localStorage.getItem("token");
-export const socket = io("ws://localhost:4000", { query: `token=${token}` });
+export const socket = io("https://shrouded-atoll-71846.herokuapp.com/", {
+  query: `token=${token}`,
+});
 
 function App() {
   axios.defaults.headers.common["Authorization"] = `bearer ${token}`;
