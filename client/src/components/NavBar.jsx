@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { FaSun } from "react-icons/fa";
 import { IoMdMoon } from "react-icons/io";
+import { FiLogOut } from "react-icons/fi";
 import { AuthContext } from "../context/AuthContext";
 
 export default function NavBar() {
@@ -30,14 +31,11 @@ export default function NavBar() {
           {user ? user.username.toUpperCase() : "HOME"}
         </Text>
         {user ? (
-          <Button
+          <FiLogOut
             onClick={logout}
-            fontSize="xl"
-            variant="ghost"
             style={{ marginLeft: "auto" }}
-          >
-            LOGOUT
-          </Button>
+            size="1.6rem"
+          />
         ) : (
           <>
             <Text

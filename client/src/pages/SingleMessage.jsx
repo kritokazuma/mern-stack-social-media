@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { WsContext } from "../App";
 import {
@@ -9,57 +9,124 @@ import {
   Text,
   Avatar,
   Flex,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useSearchParams } from "react-router-dom";
+import { Scrollbars } from "react-custom-scrollbars";
+import Messages from "../components/Messages";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 
 export default function SingleMessage() {
   const params = useParams();
   const friendId = params.user;
 
+  const scrollBar = useRef();
+
   const { socket } = useContext(WsContext);
 
-  const [searchParams, setSearchParams] = useSearchParams()
-  console.log(searchParams.get('user'))
+  const { user } = useContext(AuthContext);
 
-  console.log(friendId);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [message, setMessage] = useState({
+    participants: [],
+    messages: [],
+  });
+
+  const [isActive, setIsActive] = useState(false);
+
+  const [friendDetails, setFriendDetails] = useState({});
+
+  const [chat, setChat] = useState("");
+
+  const borderColor = useColorModeValue("#E2E8F0", "#4A5568");
+
+  useEffect(async () => {
+    if (user) {
+      const res = await axios.get(
+        `/api/conservation/messages/${friendId}?user=${searchParams.get(
+          "user"
+        )}`
+      );
+
+      setMessage((preVal) => {
+        return {
+          ...preVal,
+          participants: res.data.message.participants,
+          messages: res.data.message.messages,
+        };
+      });
+      setFriendDetails(res.data.friendDetails);
+
+      //websocket
+      socket.emit("is_active", { id: friendId });
+    }
+  }, []);
+
+  useEffect(() => {
+    socket.on("active_status", (data) => setIsActive(data));
+  }, [socket]);
+
+  // scrollBar.current.scrollToBottom();
+  console.log(scrollBar.current);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
+  const profileImage = friendDetails
+    ? `/api/${friendDetails.profileImage}`
+    : "";
 
   return (
     <Box>
-      <Box h="80vh" borderWidth="1px" borderRadius="lg" mt={2}>
-        <Flex m={3}>
+      <Box borderWidth="1px" borderRadius="lg" mt={2}>
+        <Flex py={2} alignItems="center">
           <Avatar
+            ml={3}
             size="md"
-            name="Dan Abrahmov"
-            src="https://bit.ly/dan-abramov"
+            name={friendDetails.username}
+            src={profileImage}
           />
-          <Box
-            w="40%"
-            bgColor="blue.500"
-            px={5}
-            py={3}
-            ml={2}
-            borderRadius="lg"
-          >
-            <Text>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora
-              labore doloribus omnis libero, numquam suscipit voluptatum,
-              quibusdam sapiente, optio repellendus quam voluptates cumque
-              accusamus atque. Nisi eos molestiae quae dicta.
+          <Box ml={3}>
+            <Text fontWeight="bold">{friendDetails.username}</Text>
+            <Text color="gray.500" isTruncated>
+              {isActive && "Active now"}
             </Text>
           </Box>
         </Flex>
       </Box>
-      <Center mt={3}>
-        <Input
-          placeholder="send a message"
-          maxW="90%"
-          onFocus={({ target }) => (target.placeholder = "Aa")}
-          onBlur={({ target }) => (target.placeholder = "send a message")}
-        />
-        <Button ml={3} colorScheme="teal">
-          Send
-        </Button>
-      </Center>
+      <Scrollbars
+        style={{
+          width: "100%",
+          height: "68vh",
+          border: `1px solid ${borderColor}`,
+          borderRadius: "10px",
+          marginTop: "10px",
+        }}
+        ref={scrollBar}
+      >
+        {message.messages.map((mes, i) => (
+          <Box key={i}>
+            <Messages value={{ mes, profileImage, user }} />
+          </Box>
+        ))}
+      </Scrollbars>
+
+      <form onSubmit={handleSubmit}>
+        <Center mt={3}>
+          <Input
+            outline="none"
+            placeholder="send a message"
+            maxW="90%"
+            onFocus={({ target }) => (target.placeholder = "Aa")}
+            onBlur={({ target }) => (target.placeholder = "send a message")}
+          />
+          <Button ml={3} colorScheme="teal" type="submit">
+            Send
+          </Button>
+        </Center>
+      </form>
     </Box>
   );
 }

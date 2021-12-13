@@ -34,14 +34,12 @@ exports.wsController = (io) => {
 
     socket.on("disconnect", () => {
       removeUser(socket.id);
-      console.log({ userLists });
       console.log("user disconnect");
       io.emit("active_user", userLists);
     });
 
     socket.on("is_active", (data) => {
       const checkFriend = userLists.filter((u) => u.userId === data.id);
-      console.log(userLists);
       if (Object.keys(checkFriend).length > 0) {
         return socket.emit("active_status", true);
       }

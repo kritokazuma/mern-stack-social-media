@@ -11,7 +11,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  CloseButton,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import axios from "axios";
@@ -19,7 +18,7 @@ import Hooks from "../utils/Hooks";
 
 export default function Login(props) {
   const formBackground = useColorModeValue("gray.100", "gray.700");
-  const lightOrDark = localStorage.getItem("chakra-ui-color-mode");
+  const fromStyle = useColorModeValue("flushed", "filled");
   const { value, handleChange, handleSubmit, errors } = Hooks(
     {
       username: "",
@@ -55,7 +54,7 @@ export default function Login(props) {
               <FormLabel>Username</FormLabel>
               <Input
                 placeholder="JohnDoe"
-                variant={lightOrDark === "dark" ? "filled" : "flushed"}
+                variant={fromStyle}
                 mb={3}
                 type="text"
                 value={value.username}
@@ -65,7 +64,7 @@ export default function Login(props) {
               <FormLabel>Password</FormLabel>
               <Input
                 placeholder="********"
-                variant={lightOrDark === "dark" ? "filled" : "flushed"}
+                variant={fromStyle}
                 mb={6}
                 type="password"
                 value={value.password}

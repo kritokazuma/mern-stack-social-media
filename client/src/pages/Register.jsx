@@ -17,7 +17,7 @@ import Hooks from "../utils/Hooks";
 
 export default function Register() {
   const formBackground = useColorModeValue("gray.100", "gray.700");
-  const lightOrDark = localStorage.getItem("chakra-ui-color-mode");
+  const fromStyle = useColorModeValue("flushed", "filled");
 
   const { value, handleChange, handleSubmit, errors } = Hooks(
     {
@@ -54,7 +54,7 @@ export default function Register() {
               </Heading>
               <FormLabel>Email</FormLabel>
               <Input
-                variant={lightOrDark === "dark" ? "filled" : "flushed"}
+                variant={fromStyle}
                 placeholder="youremail@email.com"
                 mb={3}
                 type="email"
@@ -64,7 +64,7 @@ export default function Register() {
               />
               <FormLabel>Username</FormLabel>
               <Input
-                variant={lightOrDark === "dark" ? "filled" : "flushed"}
+                variant={fromStyle}
                 placeholder="JohnDoe"
                 mb={3}
                 type="text"
@@ -75,7 +75,7 @@ export default function Register() {
               <FormLabel>Password</FormLabel>
               <Input
                 placeholder="********"
-                variant={lightOrDark === "dark" ? "filled" : "flushed"}
+                variant={fromStyle}
                 mb={3}
                 type="password"
                 name="password"
@@ -85,7 +85,7 @@ export default function Register() {
               <FormLabel>Confirm Password</FormLabel>
               <Input
                 placeholder="********"
-                variant={lightOrDark === "dark" ? "filled" : "flushed"}
+                variant={fromStyle}
                 mb={6}
                 type="password"
                 name="confirmPassword"
