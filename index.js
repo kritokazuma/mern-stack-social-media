@@ -31,7 +31,14 @@ app.use("/api/images", express.static(path.join(__dirname, "public/images")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "https://mern-stack-social-media.vercel.app" }));
+app.use(
+  cors({
+    origin: [
+      "https://mern-stack-social-media.vercel.app",
+      "https://localhost:3000",
+    ],
+  })
+);
 app.use(fileUpload());
 
 //Connect MongoDb
