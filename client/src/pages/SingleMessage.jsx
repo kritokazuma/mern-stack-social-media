@@ -59,8 +59,6 @@ export default function SingleMessage() {
           };
         });
         setFriendDetails(res.data.friendDetails);
-
-        scrollBar.current && scrollBar.current.scrollToBottom();
       }
 
       //websocket
@@ -68,14 +66,44 @@ export default function SingleMessage() {
     }
   }, []);
 
+  const addMessage = (username, message) => {
+    setMessage((preVal) => {
+      return {
+        ...preVal,
+        messages: [
+          ...preVal.messages,
+          {
+            sender: username,
+            message: message,
+            timetamp: Date.now(),
+          },
+        ],
+      };
+    });
+  };
+
   useEffect(() => {
     socket.on("active_status", (data) => setIsActive(data));
+    socket.on("received_message", ({ username, id, message }) => {
+      addMessage(username, message);
+    });
   }, [socket]);
 
   // scrollBar.current.scrollToBottom();
   const handleSubmit = (e) => {
     e.preventDefault();
+    socket.emit("sendToMessage", {
+      friendId,
+      friendUsername: friendDetails.username,
+      message: chat,
+    });
+    addMessage(user.username, chat);
+    setChat("");
   };
+
+  useEffect(() => {
+    scrollBar.current && scrollBar.current.scrollToBottom();
+  }, [message]);
 
   const profileImage = friendDetails
     ? `/api/${friendDetails.profileImage}`
@@ -125,8 +153,10 @@ export default function SingleMessage() {
             maxW="90%"
             onFocus={({ target }) => (target.placeholder = "Aa")}
             onBlur={({ target }) => (target.placeholder = "send a message")}
+            value={chat}
+            onChange={(e) => setChat(e.target.value)}
           />
-          <Button ml={3} colorScheme="teal" type="submit">
+          <Button ml={3} isDisabled={!chat} colorScheme="teal" type="submit">
             Send
           </Button>
         </Center>

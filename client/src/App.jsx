@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import NavBar from "./components/NavBar";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -28,6 +33,8 @@ function App() {
   const [acceptUser, setAcceptUser] = useState({});
   const [isAccept, setIsAccept] = useState(false);
 
+  const [message, setMessage] = useState({ sender: "", message: "" });
+
   const addToast = (username, userId) => {
     toastRef.current = toast({
       title: (
@@ -51,6 +58,12 @@ function App() {
       addToast(username, userId);
     });
     socket.on("accept_noti", (data) => setAcceptUser(data));
+
+    socket.on("received_message", ({ username, message }) =>
+      setMessage((preVal) => {
+        return { ...preVal, sender: username, message };
+      })
+    );
   }, [socket]);
 
   useEffect(() => {
@@ -62,7 +75,22 @@ function App() {
         isClosable: true,
       });
     }
-  }, [acceptUser]);
+    if (
+      !window.location.pathname.slice(1).startsWith("messages") &&
+      message.sender &&
+      message.message
+    ) {
+      toast({
+        title: `${message.sender} send a message`,
+        position: "top-right",
+        duration: 10000,
+        isClosable: true,
+        description: message.message,
+      });
+    }
+  }, [acceptUser, message]);
+
+  console.log(message);
 
   socket.on("active_user", (data) => {
     console.log(data);
@@ -85,7 +113,7 @@ function App() {
                   <UserPosts acceptUser={acceptUser} isAccept={isAccept} />
                 }
               />
-              <Route path="/:user/messages" element={<SingleMessage />} />
+              <Route path="/messages/:user" element={<SingleMessage />} />
             </Routes>
           </Container>
         </AuthProvider>
