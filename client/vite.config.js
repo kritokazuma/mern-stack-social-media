@@ -7,10 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://arcane-taiga-95230.herokuapp.com",
+        target: "http://localhost:4000",
         rewrite: (path) => path.replace("/^/api/", ""),
-        changeOrigin: true,
-        secure: false,
       },
       "/ws": {
         target: "ws://localhost:4000",
