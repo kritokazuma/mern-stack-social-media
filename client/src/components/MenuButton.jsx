@@ -32,7 +32,8 @@ export default function MenuKey({
   setComments,
   toHome,
   post,
-  setPost
+  setPost,
+  setUserPosts,
 }) {
   //hook to open drawer
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -48,11 +49,16 @@ export default function MenuKey({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { user } = useContext(AuthContext);
+
   async function handleDelete() {
     if (type === "post") {
       const deletePost = await axios.delete(`/api/posts?postid=${postId}`);
       setPosts &&
         setPosts((preVal) => {
+          return preVal.filter((p) => p._id !== postId);
+        });
+      setUserPosts &&
+        setUserPosts((preVal) => {
           return preVal.filter((p) => p._id !== postId);
         });
       toHome && nevigate("/");

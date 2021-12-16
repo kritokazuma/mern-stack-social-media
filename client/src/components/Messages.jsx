@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Flex, Avatar, Box, Text, useColorModeValue } from "@chakra-ui/react";
 
 export default function Messages({ value: { mes, profileImage, user } }) {

@@ -13,7 +13,6 @@ import {
   AlertTitle,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import axios from "axios";
 import Hooks from "../utils/Hooks";
 
 export default function Login(props) {
@@ -27,7 +26,6 @@ export default function Login(props) {
     "login",
     props
   );
-  console.log(errors && Object.keys(errors).length);
   return (
     <>
       {errors && Object.keys(errors).length > 0 && (

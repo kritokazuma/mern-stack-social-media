@@ -71,7 +71,6 @@ export default function UserPosts({ acceptUser, isAccept }) {
       username: user.username,
     });
     if (!isFriend.status || !isFriend.isFriend) {
-      console.log("add");
       setIsFriend((preVal) => {
         return {
           ...preVal,
@@ -120,14 +119,12 @@ export default function UserPosts({ acceptUser, isAccept }) {
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log(res.data);
     setUpdate(!update);
   };
   /*----------end-----------*/
 
   /*---------fetch user posts------------- */
   useEffect(async () => {
-    console.log("i got called");
     try {
       const getPosts = await axios.get(`/api/posts/user/${username}`);
       setUserPosts(getPosts.data.posts);
@@ -140,7 +137,6 @@ export default function UserPosts({ acceptUser, isAccept }) {
 
   /*--------------Update isFriend Hook---------------- */
   useEffect(() => {
-    console.log("user post call eff");
     /*---------check friend status from userDetails-------- */
     if (Object.keys(userDetails).length > 0) {
       const check = user
@@ -151,7 +147,6 @@ export default function UserPosts({ acceptUser, isAccept }) {
       const addDetail = (state) => {
         return check && check !== false ? check[state] : " ";
       };
-      console.log(check);
       setIsFriend({
         isFriend: check && check.status !== "pending" ? true : false,
         status: addDetail("status"),
@@ -298,7 +293,7 @@ export default function UserPosts({ acceptUser, isAccept }) {
         {userPosts.map((post) => (
           <Box key={post._id}>
             <UserPostsContext.Provider value={{ post, setUserPosts }}>
-              <Posts post={post} />
+              <Posts post={post} setUserPosts={setUserPosts} />
             </UserPostsContext.Provider>
           </Box>
         ))}

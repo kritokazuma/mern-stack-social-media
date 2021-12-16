@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import NavBar from "./components/NavBar";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -17,6 +12,7 @@ import SingleMessage from "./pages/SingleMessage";
 import axios from "axios";
 import { io } from "socket.io-client";
 import Toast from "./components/Toast";
+import { AuthRoutes, PrivacyRoute } from "./utils/AuthRoutes";
 import "./App.css";
 
 export const WsContext = React.createContext();
@@ -90,8 +86,6 @@ function App() {
     }
   }, [acceptUser, message]);
 
-  console.log(message);
-
   socket.on("active_user", (data) => {
     console.log(data);
   });
@@ -104,8 +98,22 @@ function App() {
           <Container maxWidth="container.lg">
             <Routes>
               <Route path="/" element={<Home />} render={<NavBar />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route
+                path="/login"
+                element={
+                  <AuthRoutes>
+                    <Login />
+                  </AuthRoutes>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <AuthRoutes>
+                    <Register />
+                  </AuthRoutes>
+                }
+              />
               <Route path="/posts/:postId" element={<SinglePost />} />
               <Route
                 path="/posts/user/:username"
@@ -113,7 +121,14 @@ function App() {
                   <UserPosts acceptUser={acceptUser} isAccept={isAccept} />
                 }
               />
-              <Route path="/messages/:user" element={<SingleMessage />} />
+              <Route
+                path="/messages/:user"
+                element={
+                  <PrivacyRoute>
+                    <SingleMessage />
+                  </PrivacyRoute>
+                }
+              />
             </Routes>
           </Container>
         </AuthProvider>

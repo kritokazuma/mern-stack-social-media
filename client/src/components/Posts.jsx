@@ -6,7 +6,7 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import MenuButton from "./MenuButton";
 
-export default function SinglePost({ post, setPosts, location }) {
+export default function SinglePost({ post, setPosts, location, setUserPosts }) {
   const profileImg =
     post.user.profileImage !== null ? `/api/${post.user.profileImage}` : "";
   return (
@@ -47,6 +47,7 @@ export default function SinglePost({ post, setPosts, location }) {
             postId={post._id}
             setPosts={setPosts}
             location={location}
+            setUserPosts={setUserPosts}
           />
         </Box>
       </Box>

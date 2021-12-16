@@ -12,7 +12,7 @@ import {
   AlertDescription,
   Center,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React from "react";
 import Hooks from "../utils/Hooks";
 
 export default function Register() {

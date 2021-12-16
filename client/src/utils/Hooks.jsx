@@ -24,7 +24,6 @@ export default function Hooks(initialVal = {}, route, props) {
       const returnVal = await axios.post(`/api/users/${route}`, value);
       if (returnVal.status === 200) {
         setValue(initialVal);
-        console.log(returnVal);
         context[route](returnVal.data);
         setErrors(false);
         nevigate("/");

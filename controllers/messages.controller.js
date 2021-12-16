@@ -25,8 +25,43 @@ exports.messageLists = async (req, res) => {
         },
         message,
       });
-    return res.status(200).json({ message: false });
+    return res.status(200).json({
+      message: false,
+      friendDetails: {
+        profileImage: friend.profileImage,
+        username: friend.username,
+      },
+    });
   } catch (error) {
+    res.status(501).json(error);
+  }
+};
+
+exports.userMessages = async (req, res) => {
+  const user = req.user;
+  try {
+    const messages = await Message.find({
+      participants: user.id,
+    }).populate({
+      path: "participants",
+      select: ["username", "profileImage"],
+      model: "User",
+    });
+    if (messages.length > 0) {
+      const mes = messages.map((m) => {
+        const friendDetails = m.participants.find(
+          (friend) => friend.id !== user.id
+        );
+        return {
+          user: friendDetails,
+          messages: m.messages[m.messages.length - 1],
+        };
+      });
+      return res.status(200).json(mes);
+    }
+    return res.status(500).json("no message found");
+  } catch (error) {
+    console.log(error);
     res.status(501).json(error);
   }
 };

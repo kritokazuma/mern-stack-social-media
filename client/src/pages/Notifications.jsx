@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { WsContext } from "../App";
-import { Box, Text, Button } from "@chakra-ui/react";
+import { Box, Text, Button, Center } from "@chakra-ui/react";
 import axios from "axios";
 
 const Notifications = () => {
@@ -28,7 +28,6 @@ const Notifications = () => {
   useEffect(async () => {
     try {
       const res = await axios.get("/api/users/notification");
-      console.log(res.data);
       setFriends(res.data.friends);
     } catch (error) {
       console.log(error);
@@ -40,11 +39,18 @@ const Notifications = () => {
       userId: id,
       status,
     });
-    console.log({ id, status });
     setAcceptUser((preVal) => [...preVal, { id, status }]);
   };
   const isAccept = (id) => acceptUser.find((u) => u.id === id);
-  console.log(friends);
+
+  if (friends.length < 1) {
+    return (
+      <>
+        <Center mt="30vh">There is no notifications</Center>
+      </>
+    );
+  }
+
   return (
     <Box>
       {friends.map((f) => (

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const messagesSchema = new mongoose.Schema({
-  participants: [String],
+  participants: [mongoose.Types.ObjectId],
   messages: [
     {
       sender: String,

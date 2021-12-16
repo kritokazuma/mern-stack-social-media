@@ -50,7 +50,7 @@ export default function SingleMessage() {
         )}`
       );
 
-      if (res) {
+      if (res.data.message) {
         setMessage((preVal) => {
           return {
             ...preVal,
@@ -58,6 +58,8 @@ export default function SingleMessage() {
             messages: res.data.message.messages,
           };
         });
+        setFriendDetails(res.data.friendDetails);
+      } else {
         setFriendDetails(res.data.friendDetails);
       }
 
