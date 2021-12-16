@@ -44,7 +44,7 @@ export default function Home() {
   }, []);
 
   if (percentage < 100) {
-    return <Progress mt={7} size="xs" isIndeterminate />;
+    return <Progress mt="30vh" size="xs" isIndeterminate />;
   }
 
   return (

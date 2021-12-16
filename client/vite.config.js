@@ -10,6 +10,11 @@ export default defineConfig({
         target: "https://arcane-taiga-95230.herokuapp.com",
         rewrite: (path) => path.replace("/^/api/", ""),
         changeOrigin: true,
+        secure: false,
+      },
+      "/ws": {
+        target: "ws://localhost:4000",
+        changeOrigin: false,
       },
     },
   },

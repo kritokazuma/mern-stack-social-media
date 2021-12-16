@@ -18,7 +18,7 @@ import "./App.css";
 export const WsContext = React.createContext();
 
 const token = localStorage.getItem("token");
-export const socket = io("ws://arcane-taiga-95230.herokuapp.com/", {
+export const socket = io("https://arcane-taiga-95230.herokuapp.com/", {
   query: `token=${token}`,
 });
 
