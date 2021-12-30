@@ -1,2 +1,16 @@
 # mern-stack-social-media
 social media using REST api
+
+<ul>
+  <li>npm install or yarn install</li>
+  <li>create .env in root dir</li>
+  <li>
+    add dotenv variable
+    MONGO_URL=your mongodb uri
+    PORT=4000
+    SECRET=your secret
+  </li>
+  <li>npm run start or yarn start</li>
+  <li>cd client</li>
+  <li>npm run dev or yarn dev</li>
+</ul>
